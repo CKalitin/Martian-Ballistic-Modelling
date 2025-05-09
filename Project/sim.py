@@ -8,9 +8,9 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
     if time_max is None:
         time_max = 5000 # seconds
     if mass is None:
-        mass = 10 # kg
+        mass = 1000 # kg
     if area is None:
-        area = 10 # m^2
+        area = 0.1 # m^2
     if entry_altitude is None:
         entry_altitude = 125000
     if entry_flight_path_angle is None:
@@ -66,7 +66,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         
         altitude += v_y * time_step
         
-        flight_path_angle = math.degrees(math.atan2(v_y / v_x))
+        flight_path_angle = math.degrees(math.atan2(v_y, v_x))
         
         times.append(t)
         altitudes.append(altitude)
@@ -82,8 +82,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         drag_coeffs.append(drag_coeff)
         atm_densities.append(atm_density)
         
-        # print all the variables listed above
-        print(f"t: {t:.2f}, altitude: {altitude:.2f}, downrange_distance: {downrange_distance:.2f}, velocity: {velocity:.2f}, v_x: {v_x:.2f}, v_y: {v_y:.2f}, a_x: {a_x:.2f}, a_y: {a_y:.2f}, net_acc: {net_acc:.2f}, drag_acc: {drag_acc:.2f}, grav_acc: {grav_acc:.2f}, flight_path_angle: {flight_path_angle:.2f}")
+        #print(f"t: {t:.2f}, altitude: {altitude:.2f}, downrange_distance: {downrange_distance:.2f}, velocity: {velocity:.2f}, v_x: {v_x:.2f}, v_y: {v_y:.2f}, a_x: {a_x:.2f}, a_y: {a_y:.2f}, net_acc: {net_acc:.2f}, drag_acc: {drag_acc:.2f}, grav_acc: {grav_acc:.2f}, flight_path_angle: {flight_path_angle:.2f}")
         
         t += time_step
     

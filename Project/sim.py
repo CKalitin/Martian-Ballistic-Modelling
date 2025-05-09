@@ -66,7 +66,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         
         altitude += v_y * time_step
         
-        flight_path_angle = math.degrees(math.atan(v_y / v_x))
+        flight_path_angle = math.degrees(math.atan2(v_y / v_x))
         
         times.append(t)
         altitudes.append(altitude)

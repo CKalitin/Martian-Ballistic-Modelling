@@ -203,13 +203,21 @@ def plot(data, filename='mars_entry_simulation.png', show=False):
     plt.grid(True)
 
     # Plot 2,3: drag_acc, grav_acc, net acc vs Time
-    plt.subplot(3, 3, 6)
+    """plt.subplot(3, 3, 6)
     plt.plot(times, drag_accs, label='Drag Acceleration')
     plt.plot(times, grav_accs, label='Gravity Acceleration')
     plt.plot(times, net_accs, label='Net Acceleration')
     plt.title('Drag and Gravity Acceleration vs Time')
     plt.ylabel('Acceleration (m/s²)')
     plt.legend()
+    plt.grid(True)"""
+
+    # Plot 3,1: Altitude vs Downrange Distance
+    plt.subplot(3, 3, 6)
+    plt.plot(downrange_dists, altitudes)
+    plt.title('Altitude vs Downrange Distance')
+    plt.xlabel('Downrange Distance (m)')
+    plt.ylabel('Altitude (m)')
     plt.grid(True)
 
     # Plot 3,1: Drag Coefficient and Atmospheric Density vs Time
@@ -250,6 +258,8 @@ def plot(data, filename='mars_entry_simulation.png', show=False):
     
     plt.text(-0.15, 0.52, f"Time Step: {params['time_step']} second(s)", fontsize=10)
     plt.text(-0.15, 0.45, f"Max Time: {params['time_max']} seconds", fontsize=10)
+    
+    plt.text(-0.15, 0.14, f"Christopher Kalitin 2025", fontsize=10)
 
     # Final values
     plt.text(0.4, 1.0, f"Final Altitude: {final['altitude']:.2f} m", fontsize=10)

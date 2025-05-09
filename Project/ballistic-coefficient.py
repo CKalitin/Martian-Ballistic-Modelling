@@ -11,7 +11,7 @@ entry_flight_path_angle = -15
 entry_velocity = 6000
 
 area = 1
-ballistic_coefficients = [0.01,0.1,1,10,100,220,1000,4444,10000,100000,1000000,10000000]  # kg/m^2
+ballistic_coefficients = [0.001,0.01,0.1,1,10,100,207,400,1000,10000,100000,1000000]  # kg/m^2
 masses = [ballistic_coefficient * area for ballistic_coefficient in ballistic_coefficients]
 terminal_velocities = []
 
@@ -44,7 +44,7 @@ plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('Ballistic Coefficient (kg/m^2)')
 plt.ylabel('Terminal Velocity (m/s)')
-plt.title('Ballistic Coefficient vs Terminal Velocity')
+plt.title('Mars Entry Terminal Velocity vs Ballistic Coefficient')
 plt.grid(True)
 for i, label in enumerate(annoation_labels):
     plt.annotate(label, xy=(ballistic_coefficients[annotation_indexes[i]], terminal_velocities[annotation_indexes[i]]), xytext=(ballistic_coefficients[annotation_indexes[i]], terminal_velocities[annotation_indexes[i]]*0.75))
@@ -56,7 +56,7 @@ plt.figure(figsize=(10, 6))
 plt.plot(ballistic_coefficients, terminal_velocities, marker='o')
 plt.xlabel('Ballistic Coefficient (kg/m^2)')
 plt.ylabel('Terminal Velocity (m/s)')
-plt.title('Ballistic Coefficient vs Terminal Velocity')
+plt.title('Mars Entry Terminal Velocity vs Ballistic Coefficient')
 plt.grid(True)
 for i, label in enumerate(annoation_labels):
     plt.annotate(label, xy=(ballistic_coefficients[annotation_indexes[i]], terminal_velocities[annotation_indexes[i]]), xytext=(ballistic_coefficients[annotation_indexes[i]], terminal_velocities[annotation_indexes[i]]*0.75))

@@ -2,7 +2,7 @@ import utils
 import math
 import matplotlib.pyplot as plt
 
-def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude=None, entry_flight_path_angle=None, entry_velocity=None):
+def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude=None, entry_flight_path_angle=None, entry_velocity=None, print_debug=False):
     if time_step is None:
         time_step = 1 # seconds
     if time_max is None:
@@ -10,7 +10,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
     if mass is None:
         mass = 1000 # kg
     if area is None:
-        area = 0.1 # m^2
+        area = 50 # m^2
     if entry_altitude is None:
         entry_altitude = 125000
     if entry_flight_path_angle is None:
@@ -43,6 +43,16 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
     grav_accs = []
     drag_coeffs = []
     atm_densities = []
+
+    if print_debug:
+        print(f"Mass: {mass} kg")
+        print(f"Area: {area} m^2")
+        print(f"Ballistic Coefficient: {ballistic_coefficient} kg/m^2")
+        print(f"Entry Altitude: {entry_altitude} m")
+        print(f"Entry Flight Path Angle: {entry_flight_path_angle} degrees")
+        print(f"Entry Velocity: {entry_velocity} m/s")
+        print(f"Time Step: {time_step} seconds")
+        print(f"Max Time: {time_max} seconds")
 
     t = 0
     while t < time_max and altitude > 0:
@@ -82,7 +92,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         drag_coeffs.append(drag_coeff)
         atm_densities.append(atm_density)
         
-        #print(f"t: {t:.2f}, altitude: {altitude:.2f}, downrange_distance: {downrange_distance:.2f}, velocity: {velocity:.2f}, v_x: {v_x:.2f}, v_y: {v_y:.2f}, a_x: {a_x:.2f}, a_y: {a_y:.2f}, net_acc: {net_acc:.2f}, drag_acc: {drag_acc:.2f}, grav_acc: {grav_acc:.2f}, flight_path_angle: {flight_path_angle:.2f}")
+        if (print_debug): print(f"t: {t:.2f}, altitude: {altitude:.2f}, downrange_distance: {downrange_distance:.2f}, velocity: {velocity:.2f}, v_x: {v_x:.2f}, v_y: {v_y:.2f}, a_x: {a_x:.2f}, a_y: {a_y:.2f}, net_acc: {net_acc:.2f}, drag_acc: {drag_acc:.2f}, grav_acc: {grav_acc:.2f}, flight_path_angle: {flight_path_angle:.2f}")
         
         t += time_step
     
@@ -128,7 +138,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         }
     }
 
-def plot(data):
+def plot(data, filename='mars_entry_simulation.png', show=False):
     times = data['times']
     altitudes = data['altitudes']
     velocities = data['velocities']
@@ -157,11 +167,11 @@ def plot(data):
     plt.ylabel('Altitude (m)')
     plt.grid(True)
 
-    # Plot 1,2: Altitude vs Downrange Distance
+    # Plot 1,2: Altitude vs. Velocity
     plt.subplot(3, 3, 2)
-    plt.plot(downrange_dists, altitudes)
-    plt.title('Altitude vs Downrange Distance')
-    plt.xlabel('Downrange Distance (m)')
+    plt.plot(velocities, altitudes)
+    plt.title('Altitude vs Velocity')
+    plt.xlabel('Velocity (m/s)')
     plt.ylabel('Altitude (m)')
     plt.grid(True)
 
@@ -238,7 +248,7 @@ def plot(data):
     plt.text(-0.15, 0.69, f"Entry Flight Path Angle: {params['entry_flight_path_angle']} degrees", fontsize=10)
     plt.text(-0.15, 0.62, f"Entry Velocity: {params['entry_velocity']} m/s", fontsize=10)
     
-    plt.text(-0.15, 0.52, f"Time Step: {params['time_step']} seconds", fontsize=10)
+    plt.text(-0.15, 0.52, f"Time Step: {params['time_step']} second(s)", fontsize=10)
     plt.text(-0.15, 0.45, f"Max Time: {params['time_max']} seconds", fontsize=10)
 
     # Final values
@@ -263,11 +273,19 @@ def plot(data):
     plt.subplots_adjust(left=0.055, right=0.98, top=0.925, bottom=0.032, hspace=0.29, wspace=0.31)
 
     # Save the plot
-    plt.savefig('mars_entry_simulation.png')
-    #plt.show()
+    plt.savefig(filename)
+    if show: plt.show()
     plt.close()
 
 # Example usage
 if __name__ == "__main__":
-    sim_data = simulate()
+    sim_data = simulate(
+        time_step=0.1,
+        time_max=5000,
+        mass=3300,
+        area=15.9,
+        entry_altitude=125000,
+        entry_flight_path_angle=-14,
+        entry_velocity=5800
+    )
     plot(sim_data)

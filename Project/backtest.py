@@ -9,6 +9,6 @@ sim_data = sim.simulate(
     entry_altitude=125000,
     entry_flight_path_angle=-14,
     entry_velocity=5800,
-    print_debug=False,
+    verbose=False,
 )
 sim.plot(sim_data, filename="backtest/Curiosity-Entry.png")

@@ -2,7 +2,7 @@ import utils
 import math
 import matplotlib.pyplot as plt
 
-def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude=None, entry_flight_path_angle=None, entry_velocity=None, print_debug=False):
+def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude=None, entry_flight_path_angle=None, entry_velocity=None, verbose=False):
     if time_step is None:
         time_step = 1 # seconds
     if time_max is None:
@@ -44,7 +44,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
     drag_coeffs = []
     atm_densities = []
 
-    if print_debug:
+    if verbose:
         print(f"Mass: {mass} kg")
         print(f"Area: {area} m^2")
         print(f"Ballistic Coefficient: {ballistic_coefficient} kg/m^2")
@@ -92,7 +92,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         drag_coeffs.append(drag_coeff)
         atm_densities.append(atm_density)
         
-        if (print_debug): print(f"t: {t:.2f}, altitude: {altitude:.2f}, downrange_distance: {downrange_distance:.2f}, velocity: {velocity:.2f}, v_x: {v_x:.2f}, v_y: {v_y:.2f}, a_x: {a_x:.2f}, a_y: {a_y:.2f}, net_acc: {net_acc:.2f}, drag_acc: {drag_acc:.2f}, grav_acc: {grav_acc:.2f}, flight_path_angle: {flight_path_angle:.2f}")
+        if (verbose): print(f"t: {t:.2f}, altitude: {altitude:.2f}, downrange_distance: {downrange_distance:.2f}, velocity: {velocity:.2f}, v_x: {v_x:.2f}, v_y: {v_y:.2f}, a_x: {a_x:.2f}, a_y: {a_y:.2f}, net_acc: {net_acc:.2f}, drag_acc: {drag_acc:.2f}, grav_acc: {grav_acc:.2f}, flight_path_angle: {flight_path_angle:.2f}")
         
         t += time_step
     

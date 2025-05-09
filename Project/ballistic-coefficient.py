@@ -24,7 +24,7 @@ for mass in masses:
         entry_altitude=entry_altitude,
         entry_flight_path_angle=entry_flight_path_angle,
         entry_velocity=entry_velocity,
-        print_debug=False,
+        verbose=False,
     )
     sim.plot(sim_data, filename=f"{file_path}Ballistic-Coefficient-{str(mass).replace(".", "")}kgm2")
     terminal_velocities.append(sim_data['final_values']['velocity'])

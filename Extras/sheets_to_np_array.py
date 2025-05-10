@@ -43,7 +43,7 @@ def format_for_python(name, v_arr, h_arr):
     """
     lines = []
     lines.append(f"# {name} Entry:")
-    lines.append(f"{name.lower()}_vel_alt = [")
+    lines.append(f"{name.lower()} = [")
     # velocities
     vel_list = ", ".join(str(x) for x in v_arr)
     lines.append("    # Velocity (m/s)")
@@ -65,27 +65,12 @@ if __name__ == "__main__":
     # paste your sheet output into this triple‑quoted string:
     raw_data = """Velocity (m/s)	Altitude (m)
 5,537	123,770
-5,537	121,311
-5,537	118,852
-5,537	116,667
-5,548	84,426
-5,548	86,885
 5,548	89,071
 5,548	91,530
-5,548	93,989
-5,548	96,175
-5,548	98,634
-5,548	101,093
-5,548	103,279
-5,548	105,738
 5,548	108,197
 5,537	110,383
-5,537	112,842
-5,537	115,027
-5,548	80,055
 5,548	79,508
 5,548	79,508
-5,548	80,055
 5,548	75,410
 5,548	72,951
 5,537	70,492
@@ -211,4 +196,4 @@ if __name__ == "__main__":
     """
     
 vel,alt = parse_vel_alt(raw_data)
-print(format_for_python("Pheonix", vel, alt))
+print(format_for_python("mer", vel, alt))

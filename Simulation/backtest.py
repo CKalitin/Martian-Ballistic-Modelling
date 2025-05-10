@@ -1,8 +1,8 @@
 import sim
 import numpy as np
 
-# Pheonix Entry:
-pheonix = [
+# Phoenix Entry:
+phoenix = [
     # Velocity (m/s)
     np.array([
     5873, 5884, 5895, 5895, 5884, 5861, 5828, 5773, 5706, 5573, 5452, 5330,
@@ -16,7 +16,7 @@ pheonix = [
     26727, 25091, 23727, 22091, 19636, 18273, 16636, 15273, 13636, 12000,
     9818, 9273, 8727, 7636, 5727, 1364, 0
     ]),
-    "Pheonix"
+    "Phoenix"
 ]
 
 # MER Entry:
@@ -49,6 +49,18 @@ curiosity = [
 sim_data = sim.simulate(
     time_step=0.01,
     time_max=1000,
+    mass=670,
+    area=15.9,
+    entry_altitude=125000,
+    entry_flight_path_angle=-13,
+    entry_velocity=5600,
+    verbose=False,
+)
+
+# Phoenix
+sim_data = sim.simulate(
+    time_step=0.01,
+    time_max=1000,
     mass=3300,
     area=15.9,
     entry_altitude=125000,
@@ -56,4 +68,5 @@ sim_data = sim.simulate(
     entry_velocity=5800,
     verbose=False,
 )
-sim.plot(sim_data, filename="backtest/Curiosity-Entry.png", comparisons=[pheonix, mer, curiosity], show=True)
+
+sim.plot(sim_data, filename="backtest/Curiosity-Entry.png", comparisons=[phoenix, mer, curiosity], show=False)

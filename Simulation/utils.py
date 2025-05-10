@@ -25,10 +25,23 @@ pressure_data = np.array([
     0.000000036, 0.000000009, 0.000000003, 0.000000001, 0.000000000, 0.0
 ])
 
-altitude_data = np.array([
+pressure_alt_data = np.array([
     34958, 42373, 52754, 60169, 70551, 77966, 85381, 94280, 100212, 107627,
     115042, 125424, 132839, 147669, 161017, 174364, 189195, 208475, 226271, 258898,
     303390, 361229, 509534, 1000000000
+])
+
+# Temperature data, temperature (K) vs. altitude (m)
+temp_data = np.array([
+    222, 222, 209, 202, 189, 171, 156, 150, 148, 144, 132,
+    130, 134, 136, 133, 129, 128, 135, 149, 176, 205,
+    219, 232, 240, 245, 251, 252, 252
+])
+
+temp_alt_data = np.array([
+    -10000000, 0, 3849, 10067, 17174, 27833, 37308, 44415, 56555, 63069,
+    72840, 80242, 85572, 92678, 99785, 104522, 110148, 113109, 116958, 122288,
+    130283, 135612, 143903, 152490, 161669, 180915, 203122, 100000000
 ])
 
 # Lift to drag ratio data, lift to drag ratio vs. AoA (degrees)
@@ -48,19 +61,36 @@ def get_interpolated_drag_coefficient(vel):
     # Since velocity_data is in descending order, reverse for np.interp
     return np.interp(vel, cd_vel_data[::-1], cd_drag_coeff_data[::-1])
 
-def get_atmospheric_density(alt):
-    # alt = meters, atmospheric density = kg/m^3
-    surface_density = 0.0207 # kg/m^3 at sea level on Mars  
-    scale_height = 11000  # Scale height in meters
-    return surface_density * np.exp(-alt / scale_height)
-
 def get_atmospheric_pressure(alt):
     # alt = meters, atmospheric pressure = Pa
-    if (alt < altitude_data[1]):
-        return 0.669*np.exp(-0.0000945*alt)*1000 # *1000 to convert to Pa
+    if (alt < pressure_alt_data[0]):
+        return 699*np.exp(-0.0000945*alt)
 
-    return np.interp(alt, altitude_data, pressure_data)
+    return np.interp(alt, pressure_alt_data, pressure_data)
 
+def get_temperature(alt):
+    # alt = meters, temperature = K
+    return np.interp(alt, temp_alt_data, temp_data)
+
+def get_atmospheric_density(alt):
+    # alt = meters, atmospheric density = kg/m^3
+    surface_density = 0.0215 # kg/m^3 at sea level on Mars  
+    scale_height = 10000  # Scale height in meters
+    return surface_density * np.exp(-alt / scale_height)
+
+def get_atmospheric_density_new(alt, pressure=None, temperature=None):
+    # alt = meters, pressure = Pa, temperature = K, atmospheric density = kg/m^3
+    if pressure is None:
+        pressure = get_atmospheric_pressure(alt)
+    if temperature is None:
+        temperature = get_temperature(alt)
+        
+    return pressure / (192.1 * temperature)  # Ideal gas law: density = pressure / (R * T)
+"""
+print("altitude,pressure,temperature,density")
+for i in range(0, 100000, 1000):
+    print(f"{i},{get_atmospheric_pressure(i)},{get_temperature(i)},{get_atmospheric_density(i)}")
+"""
 def get_gravity_acc(alt):
     # alt = meters, gravity = m/s^2
     

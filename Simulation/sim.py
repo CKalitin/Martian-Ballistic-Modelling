@@ -121,24 +121,12 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
             'entry_velocity': entry_velocity,
             'time_step': time_step,
             'time_max': time_max
-        },
-        'final_values': {
-            'altitude': altitude,
-            'downrange_distance': downrange_distance,
-            'velocity': velocity,
-            'v_x': v_x,
-            'v_y': v_y,
-            'a_x': a_x,
-            'a_y': a_y,
-            'net_acc': net_acc,
-            'drag_acc': drag_acc,
-            'grav_acc': grav_acc,
-            'flight_path_angle': flight_path_angle,
-            'time': t
         }
     }
 
-def plot(data, filename='mars_entry_simulation.png', show=False):
+def plot(data, filename='mars_entry_simulation.png', show=False, comparisons=None):
+    # Comparisions is a list of tuples (velocity, altitude, label), MAKE SURE ITS A LIST, NOT JUST A TUPLE, USE THE SQUARE BRACKETS
+    
     times = data['times']
     altitudes = data['altitudes']
     velocities = data['velocities']
@@ -154,7 +142,6 @@ def plot(data, filename='mars_entry_simulation.png', show=False):
     drag_coeffs = data['drag_coeffs']
     atm_densities = data['atm_densities']
     params = data['parameters']
-    final = data['final_values']
     
     # Create figure
     plt.figure(figsize=(19.20, 10.80), dpi=100)
@@ -169,19 +156,24 @@ def plot(data, filename='mars_entry_simulation.png', show=False):
 
     # Plot 1,2: Altitude vs. Velocity
     plt.subplot(3, 3, 2)
-    plt.plot(velocities, altitudes)
+    plt.plot(velocities, altitudes, label='Simulation')
+    if (comparisons is not None): 
+        for comparison_vel_alt_label in comparisons:
+            plt.plot(comparison_vel_alt_label[0], comparison_vel_alt_label[1], label=comparison_vel_alt_label[2], linestyle='--')
     plt.title('Altitude vs Velocity')
     plt.xlabel('Velocity (m/s)')
     plt.ylabel('Altitude (m)')
+    plt.legend()
     plt.grid(True)
 
-    # Plot 1,3: Downrange Distance vs Time
+    # Plot 1,3: Altitude vs Downrange Distance
     plt.subplot(3, 3, 3)
-    plt.plot(times, downrange_dists)
-    plt.title('Downrange Distance vs Time')
-    plt.ylabel('Downrange Distance (m)')
+    plt.plot(downrange_dists, altitudes)
+    plt.title('Altitude vs Downrange Distance')
+    plt.xlabel('Downrange Distance (m)')
+    plt.ylabel('Altitude (m)')
     plt.grid(True)
-
+    
     # Plot 2,1: Velocities vs Time
     plt.subplot(3, 3, 4)
     plt.plot(times, velocities, label='Total Velocity')
@@ -203,21 +195,13 @@ def plot(data, filename='mars_entry_simulation.png', show=False):
     plt.grid(True)
 
     # Plot 2,3: drag_acc, grav_acc, net acc vs Time
-    """plt.subplot(3, 3, 6)
+    plt.subplot(3, 3, 6)
     plt.plot(times, drag_accs, label='Drag Acceleration')
     plt.plot(times, grav_accs, label='Gravity Acceleration')
     plt.plot(times, net_accs, label='Net Acceleration')
     plt.title('Drag and Gravity Acceleration vs Time')
     plt.ylabel('Acceleration (m/s²)')
     plt.legend()
-    plt.grid(True)"""
-
-    # Plot 3,1: Altitude vs Downrange Distance
-    plt.subplot(3, 3, 6)
-    plt.plot(downrange_dists, altitudes)
-    plt.title('Altitude vs Downrange Distance')
-    plt.xlabel('Downrange Distance (m)')
-    plt.ylabel('Altitude (m)')
     plt.grid(True)
 
     # Plot 3,1: Drag Coefficient and Atmospheric Density vs Time
@@ -262,21 +246,22 @@ def plot(data, filename='mars_entry_simulation.png', show=False):
     plt.text(-0.15, 0.14, f"Christopher Kalitin 2025", fontsize=10)
 
     # Final values
-    plt.text(0.4, 1.0, f"Final Altitude: {final['altitude']:.2f} m", fontsize=10)
-    plt.text(0.4, 0.93, f"Final Downrange Distance: {final['downrange_distance']:.2f} m", fontsize=10)
+    plt.text(0.4, 1.0, f"Final Altitude: {altitudes[-1]:.2f} m", fontsize=10)
+    plt.text(0.4, 0.93, f"Final Downrange Distance: {downrange_dists[-1]:.2f} m", fontsize=10)
     
-    plt.text(0.4, 0.83, f"Final Velocity: {final['velocity']:.2f} m/s", fontsize=10)
-    plt.text(0.4, 0.76, f"Final Horizontal Velocity: {final['v_x']:.2f} m/s", fontsize=10)
-    plt.text(0.4, 0.69, f"Final Vertical Velocity: {final['v_y']:.2f} m/s", fontsize=10)
+    # refactor all below to use -1 index instead of final
+    plt.text(0.4, 0.86, f"Final Velocity: {velocities[-1]:.2f} m/s", fontsize=10)
+    plt.text(0.4, 0.79, f"Final Horizontal Velocity: {v_xs[-1]:.2f} m/s", fontsize=10)
+    plt.text(0.4, 0.72, f"Final Vertical Velocity: {v_ys[-1]:.2f} m/s", fontsize=10)
     
-    plt.text(0.4, 0.59, f"Final Acceleration: {final['net_acc']:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.52, f"Final Drag Acceleration: {final['drag_acc']:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.45, f"Final Gravity Acceleration: {final['grav_acc']:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.38, f"Final Horizontal Acceleration: {final['a_x']:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.31, f"Final Vertical Acceleration: {final['a_y']:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.62, f"Final Acceleration: {net_accs[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.55, f"Final Horizontal Acceleration: {a_xs[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.48, f"Final Vertical Acceleration: {a_ys[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.41, f"Final Drag Acceleration: {drag_accs[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.34, f"Final Gravity Acceleration: {grav_accs[-1]:.2f} m/s²", fontsize=10)
     
-    plt.text(0.4, 0.21, f"Final Flight Path Angle: {final['flight_path_angle']:.2f} degrees", fontsize=10)
-    plt.text(0.4, 0.14, f"Final Time: {final['time']:.2f} seconds", fontsize=10)
+    plt.text(0.4, 0.24, f"Final Flight Path Angle: {flight_path_angles[-1]:.2f} degrees", fontsize=10)
+    plt.text(0.4, 0.17, f"Final Time: {times[-1]:.2f} seconds", fontsize=10)
 
     # Adjust layout
     plt.tight_layout()

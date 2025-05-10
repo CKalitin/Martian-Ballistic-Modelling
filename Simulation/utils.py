@@ -17,6 +17,15 @@ cd_vel_data = np.array([
     190, 180, 150, 100, 0, 
 ])
 
+# Lift to drag ratio data, lift to drag ratio vs. AoA (degrees)
+ld_ratio_data = np.array([
+    
+])
+
+ld_vel_data = np.array([
+    
+])
+
 # Atmospheric pressure data, pressure vs. altitude (m)
 pressure_data = np.array([
     23.257310206, 9.565493821, 2.925754907, 0.963657775, 0.254181943, 0.097081899,
@@ -44,15 +53,6 @@ temp_alt_data = np.array([
     130283, 135612, 143903, 152490, 161669, 180915, 203122, 100000000
 ])
 
-# Lift to drag ratio data, lift to drag ratio vs. AoA (degrees)
-ld_ratio_data = np.array([
-    
-])
-
-ld_vel_data = np.array([
-    
-])
-
 def get_interpolated_drag_coefficient(vel):
     # vel = m/s
     if vel < cd_vel_data[-1] or vel > cd_vel_data[0]:
@@ -78,7 +78,8 @@ def get_atmospheric_density(alt):
     scale_height = 10000  # Scale height in meters
     return surface_density * np.exp(-alt / scale_height)
 
-def get_atmospheric_density_new(alt, pressure=None, temperature=None):
+# Alternative formula that gives default value of ~0.015, not using this one
+def get_atmospheric_density_other(alt, pressure=None, temperature=None):
     # alt = meters, pressure = Pa, temperature = K, atmospheric density = kg/m^3
     if pressure is None:
         pressure = get_atmospheric_pressure(alt)
@@ -86,11 +87,7 @@ def get_atmospheric_density_new(alt, pressure=None, temperature=None):
         temperature = get_temperature(alt)
         
     return pressure / (192.1 * temperature)  # Ideal gas law: density = pressure / (R * T)
-"""
-print("altitude,pressure,temperature,density")
-for i in range(0, 100000, 1000):
-    print(f"{i},{get_atmospheric_pressure(i)},{get_temperature(i)},{get_atmospheric_density(i)}")
-"""
+
 def get_gravity_acc(alt):
     # alt = meters, gravity = m/s^2
     

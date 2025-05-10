@@ -1,6 +1,7 @@
 import utils
 import math
 import matplotlib.pyplot as plt
+import numpy as np
 
 def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude=None, entry_flight_path_angle=None, entry_velocity=None, verbose=False):
     if time_step is None:
@@ -42,6 +43,8 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
     drag_accs = []
     grav_accs = []
     drag_coeffs = []
+    atm_pressures = []
+    atm_temperatures = []
     atm_densities = []
 
     if verbose:
@@ -56,7 +59,9 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
 
     t = 0
     while t < time_max and altitude > 0:
-        atm_density = utils.get_atmospheric_density(altitude)
+        atm_pressure = utils.get_atmospheric_pressure(altitude) # Just for printing
+        atm_temperature = utils.get_temperature(altitude) # Just for printing
+        atm_density = utils.get_atmospheric_density(altitude) # Be sure not to use the formula that requires pressure and temp
         drag_coeff = utils.get_interpolated_drag_coefficient(velocity)
         drag_acc = utils.get_drag_acc(mass, velocity, area, drag_coeff, atm_density)
         
@@ -90,6 +95,8 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         drag_accs.append(drag_acc)
         grav_accs.append(grav_acc)
         drag_coeffs.append(drag_coeff)
+        atm_pressures.append(atm_pressure)
+        atm_temperatures.append(atm_temperature)
         atm_densities.append(atm_density)
         
         if (verbose): print(f"t: {t:.2f}, altitude: {altitude:.2f}, downrange_distance: {downrange_distance:.2f}, velocity: {velocity:.2f}, v_x: {v_x:.2f}, v_y: {v_y:.2f}, a_x: {a_x:.2f}, a_y: {a_y:.2f}, net_acc: {net_acc:.2f}, drag_acc: {drag_acc:.2f}, grav_acc: {grav_acc:.2f}, flight_path_angle: {flight_path_angle:.2f}")
@@ -111,6 +118,8 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         'drag_accs': drag_accs,
         'grav_accs': grav_accs,
         'drag_coeffs': drag_coeffs,
+        'atm_pressures': atm_pressures,
+        'atm_temperatures': atm_temperatures,
         'atm_densities': atm_densities,
         'parameters': {
             'mass': mass,
@@ -140,6 +149,8 @@ def plot(data, filename='mars_entry_simulation.png', show=False, comparisons=Non
     drag_accs = data['drag_accs']
     grav_accs = data['grav_accs']
     drag_coeffs = data['drag_coeffs']
+    atm_pressures = data['atm_pressures']
+    atm_temperatures = data['atm_temperatures']
     atm_densities = data['atm_densities']
     params = data['parameters']
     
@@ -156,10 +167,11 @@ def plot(data, filename='mars_entry_simulation.png', show=False, comparisons=Non
 
     # Plot 1,2: Altitude vs. Velocity
     plt.subplot(3, 3, 2)
+    plt.subplot(3, 3, 2)
     plt.plot(velocities, altitudes, label='Simulation')
-    if (comparisons is not None): 
-        for comparison_vel_alt_label in comparisons:
-            plt.plot(comparison_vel_alt_label[0], comparison_vel_alt_label[1], label=comparison_vel_alt_label[2], linestyle='--')
+    if comparisons is not None:
+        for vel, alt, label in comparisons:
+            plt.plot(vel, alt, '--', label=label)
     plt.title('Altitude vs Velocity')
     plt.xlabel('Velocity (m/s)')
     plt.ylabel('Altitude (m)')
@@ -208,19 +220,34 @@ def plot(data, filename='mars_entry_simulation.png', show=False, comparisons=Non
     plt.subplot(3, 3, 7)
     ax5_1 = plt.gca()
     ax5_1.plot(times, drag_coeffs, 'b-', label='Drag Coefficient')
-    ax5_1.set_title('Drag Coefficient and Atmospheric Density vs Time')
+    ax5_1.set_title('Drag Coefficient, Atmospheric Pressure, Temperature, Density vs Time')
     ax5_1.set_ylabel('Drag Coefficient', color='b')
     ax5_1.tick_params(axis='y', labelcolor='b')
     ax5_1.grid(True)
 
     ax5_2 = ax5_1.twinx()
-    ax5_2.plot(times, atm_densities, 'r-', label='Atmospheric Density')
-    ax5_2.set_ylabel('Density (kg/m³)', color='r')
-    ax5_2.tick_params(axis='y', labelcolor='r')
+    ax5_2.plot(times, atm_pressures, 'g-', label='Atmospheric Pressure')
+    ax5_2.set_ylabel('Pressure (Pa)', color='g')
+    ax5_2.tick_params(axis='y', labelcolor='g')
 
-    lines1, labels1 = ax5_1.get_legend_handles_labels()
+    ax5_3 = ax5_1.twinx()
+    ax5_3.spines['right'].set_position(('outward', 60))  # Move the third y-axis outward
+    ax5_3.plot(times, atm_temperatures, 'm-', label='Atmospheric Temperature')
+    ax5_3.set_ylabel('Temperature (K)', color='m')
+    ax5_3.tick_params(axis='y', labelcolor='m')
+    
+    ax5_4 = ax5_1.twinx()
+    ax5_4.spines['right'].set_position(('outward', 120))  # Move the fourth y-axis outward
+    ax5_4.plot(times, atm_densities, 'r-', label='Atmospheric Density')
+    ax5_4.set_ylabel('Density (kg/m³)', color='r')
+    ax5_4.tick_params(axis='y', labelcolor='r')
+    
+    # Add legends for each y-axis
+    lines, labels = ax5_1.get_legend_handles_labels()
     lines2, labels2 = ax5_2.get_legend_handles_labels()
-    ax5_1.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
+    lines3, labels3 = ax5_3.get_legend_handles_labels()
+    lines4, labels4 = ax5_4.get_legend_handles_labels()
+    ax5_1.legend(lines + lines2 + lines3 + lines4, labels + labels2 + labels3 + labels4, loc='upper left')
 
     # Plot 3,2: Flight Path Angle vs Time
     plt.subplot(3, 3, 8)
@@ -283,4 +310,4 @@ if __name__ == "__main__":
         entry_flight_path_angle=-14,
         entry_velocity=5800
     )
-    plot(sim_data)
+    plot(sim_data, show=True)

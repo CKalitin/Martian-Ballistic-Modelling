@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from collections import deque
 
 try:
     from skimage.morphology import skeletonize
@@ -9,11 +10,13 @@ except ImportError:
 # --- User-Configurable Variables ---
 image_path = 'extract_image.png'   # Path to your input chart image
 # Set your target HSV color (hue: 0-179, sat: 0-255, val: 0-255)
-target_hsv = (int(240/2), int(74*2.55), int(100*2.55))
+target_hsv = (int(0/2), int(0*2.55), int(0*2.55))
 # HSV tolerance around target: (hue_range, sat_range, val_range)
-hsv_range = (20, 50, 50)
+hsv_range = (1, 1, 1)
 # Number of evenly spaced points you want along the curve
-num_points = 200
+num_points = 500
+
+sort_by_corner  = True
 # -----------------------------------
 
 def extract_color_mask(image, target_hsv, hsv_range):
@@ -84,6 +87,64 @@ def build_path(skel, start):
         current = found
     return path
 
+def sort_along_skeleton(skel, points, start_pt):
+    """
+    skel : 2D binary (0/255) numpy array of your thinned line
+    points: list of (x,y) sampled points
+    start_pt: (x0,y0) coordinate to start BFS from (must lie on skel)
+    Returns: points sorted by graph‐distance from start_pt
+    """
+    h, w = skel.shape
+    # 1) BFS to build distance map
+    D = -np.ones((h, w), dtype=int)
+    dq = deque([start_pt])
+    D[start_pt[1], start_pt[0]] = 0
+    nbrs = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
+    while dq:
+        x,y = dq.popleft()
+        for dx,dy in nbrs:
+            nx, ny = x+dx, y+dy
+            if 0 <= nx < w and 0 <= ny < h \
+               and skel[ny, nx] > 0 \
+               and D[ny, nx] < 0:
+                D[ny, nx] = D[y, x] + 1
+                dq.append((nx, ny))
+
+    # 2) For each sample point, snap to nearest skel pixel within r
+    #    (you can tune r to e.g. 2–5 pixels)
+    sorted_pts = []
+    for px, py in points:
+        best_d = None
+        best_pt = None
+        for dx in range(-3, 4):
+            for dy in range(-3, 4):
+                sx, sy = px+dx, py+dy
+                if 0 <= sx < w and 0 <= sy < h and D[sy, sx] >= 0:
+                    dval = D[sy, sx]
+                    if best_d is None or dval < best_d:
+                        best_d = dval
+                        best_pt = (px, py)
+        if best_d is None:
+            # fallback: use Manhattan from start
+            best_d = abs(px - start_pt[0]) + abs(py - start_pt[1])
+        sorted_pts.append((best_d, (px, py)))
+
+    # 3) sort by distance
+    sorted_pts.sort(key=lambda x: x[0])
+    return [pt for _, pt in sorted_pts]
+
+def remove_duplicates(points):
+    """
+    Remove duplicate points from a list of (x,y) tuples.
+    """
+    seen = set()
+    unique_points = []
+    for pt in points:
+        if pt not in seen:
+            seen.add(pt)
+            unique_points.append(pt)
+    return unique_points
+
 def sample_evenly(path, num_samples):
     dists = [0.0]
     for i in range(1, len(path)):
@@ -134,10 +195,11 @@ def process(image_path, target_hsv, hsv_range, num_points):
     else:
         all_samples.extend([all_samples[-1]] * (num_points - len(all_samples)))
 
-    return mask, all_samples
+    return mask, skel, all_samples
 
 # Run processing with the above variables
-mask, even_points = process(image_path, target_hsv, hsv_range, num_points)
+mask, skel, even_points = process(image_path, target_hsv, hsv_range, num_points)
+even_points = remove_duplicates(even_points)
 
 cv2_visualize = False
 if cv2_visualize:
@@ -219,14 +281,28 @@ def in_any_roi(pt):
 
 even_points = [pt for pt in even_points if not in_any_roi(pt)]
 
-# Optional: show cleaned result
-disp2 = cv2.cvtColor(mask.copy(), cv2.COLOR_GRAY2BGR)
-for px, py in even_points:
-    cv2.circle(disp2, (px, py), 2, (0,255,0), -1)
-cv2.imshow("Cleaned Points", disp2)
+# ——— Begin re‑ordering along the curve ———
+ends     = find_endpoints(skel)
+start_pt = max(ends, key=lambda p: p[1])
+even_points = sort_along_skeleton(skel, even_points, start_pt)
+# ——— End re‑ordering ———
+
+# ——— Optional: sort by distance from bottom‑left ———
+if sort_by_corner:
+    h, w = skel.shape
+    ref = (0, h-1)   # bottom-left corner
+    even_points.sort(
+        key=lambda pt: (pt[0] - ref[0])**2 + (pt[1] - ref[1])**2
+    )
+# ——— End corner sort ———
+
+# Optional: visualize the newly ordered points
+disp3 = cv2.cvtColor(mask.copy(), cv2.COLOR_GRAY2BGR)
+for x, y in even_points:
+    cv2.circle(disp3, (x, y), 2, (128, 128, 128), -1)
+cv2.imshow("Ordered Points", disp3)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-# --- End Interactive ROI Removal Block ---
 
 # Finally, print your remaining coords
 for x, y in even_points:

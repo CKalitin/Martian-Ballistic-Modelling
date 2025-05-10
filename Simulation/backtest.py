@@ -32,6 +32,18 @@ mer = [
     "MER"
 ]
 
+# Curiosity Entry:
+curiosity = [
+    # Velocity (m/s)
+    np.array([
+    466, 750, 1500, 3562, 5126, 5703, 5681, 5613, 5614
+    ]),
+    # Altitude (m)
+    np.array([
+    1200, 15000, 14000, 18000, 30000, 51000, 73000, 77000, 123000
+    ]),
+    "Curiosity"
+]
 
 # Curiosity
 sim_data = sim.simulate(
@@ -44,4 +56,4 @@ sim_data = sim.simulate(
     entry_velocity=5800,
     verbose=False,
 )
-sim.plot(sim_data, filename="backtest/Curiosity-Entry.png", comparisons=[pheonix, mer])
+sim.plot(sim_data, filename="backtest/Curiosity-Entry.png", comparisons=[pheonix, mer, curiosity], show=True)

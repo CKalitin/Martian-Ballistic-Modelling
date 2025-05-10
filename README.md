@@ -6,3 +6,8 @@ Project Notes: https://docs.google.com/document/d/1ly_03dqeLvqldw1R2ucLL4pWBLjph
 Project Spreadsheet: https://docs.google.com/spreadsheets/d/1tmwKuVABUd6NjIiFCKm2_hXt3HP747TOeOaumtxbcEM/edit?usp=sharing  
 Project Files: https://drive.google.com/drive/folders/1TZtnQIGfnQR2XwH2QPFnw9MOi98Vhi4a?usp=sharing  
 Project Blog Post: Soon!  
+
+# Todo
+1. Add the rest of the Mars Lander trajectories from Handmers chart
+2. Add existing lander parameters to backtest.py
+3. Fit best atmosphere model / drag multiplier to ensure back tests match

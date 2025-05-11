@@ -4,23 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude=None, entry_flight_path_angle=None, entry_velocity=None, verbose=False):
+def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entry_altitude=None, entry_flight_path_angle=None, entry_velocity=None, verbose=False):
     start_time = time.time()
-    
-    if time_step is None:
-        time_step = 1 # seconds
-    if time_max is None:
-        time_max = 5000 # seconds
-    if mass is None:
-        mass = 1000 # kg
-    if area is None:
-        area = 50 # m^2
-    if entry_altitude is None:
-        entry_altitude = 125000
-    if entry_flight_path_angle is None:
-        entry_flight_path_angle = -15 # degrees
-    if entry_velocity is None:
-        entry_velocity = 6000 # m/s
+
+    if type(aoa) != list:
+        aoa = [[entry_altitude, aoa], [0, aoa]]
+    aoa_list = utils.get_numpy_aoa_list(aoa)
 
     ballistic_coefficient = mass / area
 
@@ -37,6 +26,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
     altitudes = []
     velocities = []
     flight_path_angles = []
+    angles_of_attack = []
     v_xs = []
     v_ys = []
     a_xs = []
@@ -44,6 +34,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
     downrange_dists = []
     net_accs = []
     drag_accs = []
+    lift_accs = []
     grav_accs = []
     drag_coeffs = []
     atm_pressures = []
@@ -68,10 +59,16 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         drag_coeff = utils.get_interpolated_drag_coefficient(velocity)
         drag_acc = utils.get_drag_acc(mass, velocity, area, drag_coeff, atm_density)
         
+        aoa = utils.get_interpolated_aoa(aoa_list, altitude)
+        angles_of_attack.append(aoa)
+        
+        lift_to_drag_ratio = utils.get_interpolated_lift_to_drag_ratio(aoa)
+        lift_acc = utils.get_lift_acc(drag_acc, lift_to_drag_ratio)
+        
         grav_acc = utils.get_gravity_acc(altitude)
         
-        a_x = drag_acc * math.cos(math.radians(flight_path_angle))
-        a_y = drag_acc * math.sin(math.radians(flight_path_angle)) + grav_acc
+        a_x = drag_acc * math.cos(math.radians(flight_path_angle)) + lift_acc * math.cos(math.radians(flight_path_angle+90))
+        a_y = drag_acc * math.sin(math.radians(flight_path_angle)) + lift_acc * math.sin(math.radians(flight_path_angle+90)) + grav_acc
         
         v_x += a_x * time_step
         v_y += a_y * time_step
@@ -96,6 +93,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         a_ys.append(a_y)
         net_accs.append(net_acc)
         drag_accs.append(drag_acc)
+        lift_accs.append(lift_acc)
         grav_accs.append(grav_acc)
         drag_coeffs.append(drag_coeff)
         atm_pressures.append(atm_pressure)
@@ -114,6 +112,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         'altitudes': altitudes,
         'velocities': velocities,
         'flight_path_angles': flight_path_angles,
+        'angles_of_attack': angles_of_attack,
         'v_xs': v_xs,
         'v_ys': v_ys,
         'a_xs': a_xs,
@@ -121,6 +120,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         'downrange_dists': downrange_dists,
         'net_accs': net_accs,
         'drag_accs': drag_accs,
+        'lift_accs': lift_accs,
         'grav_accs': grav_accs,
         'drag_coeffs': drag_coeffs,
         'atm_pressures': atm_pressures,
@@ -146,6 +146,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     altitudes = data['altitudes']
     velocities = data['velocities']
     flight_path_angles = data['flight_path_angles']
+    angles_of_attack = data['angles_of_attack']
     v_xs = data['v_xs']
     v_ys = data['v_ys']
     a_xs = data['a_xs']
@@ -153,6 +154,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     downrange_dists = data['downrange_dists']
     net_accs = data['net_accs']
     drag_accs = data['drag_accs']
+    lift_accs = data['lift_accs']
     grav_accs = data['grav_accs']
     drag_coeffs = data['drag_coeffs']
     atm_pressures = data['atm_pressures']
@@ -216,9 +218,10 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     plt.legend()
     plt.grid(True)
 
-    # Plot 2,3: drag_acc, grav_acc, net acc vs Time
+    # Plot 2,3: drag_acc, lift_acc, grav_acc, net acc vs Time
     plt.subplot(3, 3, 6)
     plt.plot(times, drag_accs, label='Drag Acceleration')
+    plt.plot(times, lift_accs, label='Lift Acceleration')
     plt.plot(times, grav_accs, label='Gravity Acceleration')
     plt.plot(times, net_accs, label='Net Acceleration')
     plt.title('Drag and Gravity Acceleration vs Time')
@@ -226,11 +229,13 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     plt.legend()
     plt.grid(True)
 
-    # Plot 3,1: Flight Path Angle vs Time
+    # Plot 3,1: Flight Path Angle and Angle of Attack vs Time
     plt.subplot(3, 3, 7)
-    plt.plot(times, flight_path_angles)
-    plt.title('Flight Path Angle vs Time')
+    plt.plot(times, flight_path_angles, label='Flight Path Angle')
+    plt.plot(times, angles_of_attack, label='Angle of Attack')
+    plt.title('Flight Path Angle and Angle of Attack vs Time')
     plt.ylabel('Angle (degrees)')
+    plt.legend()
     plt.grid(True)
 
     # Plot 3,2: Drag Coefficient and Atmospheric Density vs Time

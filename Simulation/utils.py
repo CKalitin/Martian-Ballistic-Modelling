@@ -19,11 +19,11 @@ cd_vel_data = np.array([
 
 # Lift to drag ratio data, lift to drag ratio vs. AoA (degrees)
 ld_ratio_data = np.array([
-    0,0.035,0.065,0.095,0.175,0.265,0.265
+    -1.5,-0.265,-0.175,-0.095,-0.065,-0.035,0,0.035,0.065,0.095,0.175,0.265,1.5
 ])
 
 ld_vel_data = np.array([
-    0,2,4,6,11,16,90
+    -90,-16,-11,-6,-4,-2,0,2,4,6,11,16,90
 ])
 
 # Atmospheric pressure data, pressure vs. altitude (m)
@@ -68,16 +68,16 @@ def get_interpolated_lift_to_drag_ratio(aoa):
     
     return np.interp(aoa, ld_vel_data, ld_ratio_data)
 
-print(get_interpolated_lift_to_drag_ratio(2))
-print(get_interpolated_lift_to_drag_ratio(4))
-print(get_interpolated_lift_to_drag_ratio(6))
-print(get_interpolated_lift_to_drag_ratio(8))
-print(get_interpolated_lift_to_drag_ratio(10))
-print(get_interpolated_lift_to_drag_ratio(12))
-print(get_interpolated_lift_to_drag_ratio(14))
-print(get_interpolated_lift_to_drag_ratio(16))
-print(get_interpolated_lift_to_drag_ratio(18))
-print(get_interpolated_lift_to_drag_ratio(20))
+def get_numpy_aoa_list(aoa_list):
+    # aoa_list = [(alt, aoa), ...], alt = meters, aoa = degrees
+    out = np.array(aoa_list)
+    # reverse the order of both columns to be in descending order
+    out[:, 0] = out[:, 0][::-1]
+    out[:, 1] = out[:, 1][::-1]
+    return out
+
+def get_interpolated_aoa(numpy_aoa_list, alt):
+    return np.interp(alt, numpy_aoa_list[:,0], numpy_aoa_list[:,1])
 
 def get_atmospheric_pressure(alt):
     # alt = meters, atmospheric pressure = Pa
@@ -125,3 +125,8 @@ def get_drag_acc(mass, vel, area, drag_coeff, atm_density):
     # atm_density = kg/m^3, vel = m/s, area = m^2, drag_coeff = dimensionless
     return -1/mass * 0.5 * atm_density * drag_coeff * area * vel**2
 
+def get_lift_acc(drag_acc, lift_to_drag_ratio):
+    # drag_acc = m/s^2, lift_to_drag_ratio = dimensionless
+    if lift_to_drag_ratio == 0:
+        return 0
+    return -drag_acc * lift_to_drag_ratio

@@ -8,5 +8,7 @@ Project Files: https://drive.google.com/drive/folders/1TZtnQIGfnQR2XwH2QPFnw9MOi
 Project Blog Post: Soon!  
 
 # Todo
-1. Add existing lander parameters to backtest.py
-2. Fit best atmosphere model / drag multiplier to ensure back tests match
+1. Get Tianwen-1 data
+2. Get Perseverance data
+3. Get raw Opportunity data
+4. Model Starship

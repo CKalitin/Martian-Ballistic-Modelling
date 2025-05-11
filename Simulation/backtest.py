@@ -71,22 +71,35 @@ viking = [
     "Viking"
 ]
 
+# Altitude vs. AoA, interpolated
+curiosity_aoa = [
+    (125000, 0),
+    (40000, 0),
+    (25000, 15),
+    (8000, 15),
+    (5000, -15),
+    (0, -15)
+]
+
 curiosity_data = sim.simulate(
     time_step=0.01,
     time_max=1000,
     mass=3300,
     area=15.9,
+    aoa=curiosity_aoa,
     entry_altitude=125000,
     entry_flight_path_angle=-14,
-    entry_velocity=5850,
+    entry_velocity=5700,
     verbose=False,
 )
 
+"""
 phoenix_data = sim.simulate(
     time_step=0.01,
     time_max=1000,
     mass=670,
     area=15.9,
+    aoa=0,
     entry_altitude=125000,
     entry_flight_path_angle=-15,
     entry_velocity=5875,
@@ -99,12 +112,14 @@ opportunity_data = sim.simulate(
     time_max=1000,
     mass=827,
     area=15.9,
+    aoa=0,
     entry_altitude=125000,
     entry_flight_path_angle=-14,
     entry_velocity=5550,
     verbose=False,
 )
+"""
 
-sim.plot(phoenix_data, "Phoenix Mars Entry Simulation", filename="backtest/Phoenix.png", comparisons=[phoenix], show=False)
 sim.plot(curiosity_data, "Curiosity Mars Entry Simulation", filename="backtest/Curiosity.png", comparisons=[curiosity], show=False)
-sim.plot(opportunity_data, "Opportunity Mars Entry Simulation", filename="backtest/Opportunity.png", comparisons=[opportunity], show=False)
+#sim.plot(phoenix_data, "Phoenix Mars Entry Simulation", filename="backtest/Phoenix.png", comparisons=[phoenix], show=False)
+#sim.plot(opportunity_data, "Opportunity Mars Entry Simulation", filename="backtest/Opportunity.png", comparisons=[opportunity], show=False)

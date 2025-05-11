@@ -10,11 +10,11 @@ except ImportError:
 # --- User-Configurable Variables ---
 image_path = 'extract_image.png'   # Path to your input chart image
 # Set your target HSV color (hue: 0-179, sat: 0-255, val: 0-255)
-target_hsv = (int(0/2), int(0*2.55), int(0*2.55))
+target_hsv = (int(240/2), int(100*2.55), int(100*2.55))
 # HSV tolerance around target: (hue_range, sat_range, val_range)
-hsv_range = (1, 1, 1)
+hsv_range = (40, 40, 40)
 # Number of evenly spaced points you want along the curve
-num_points = 500
+num_points = 400
 
 sort_by_corner  = True
 # -----------------------------------

@@ -59,7 +59,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
         drag_coeff = utils.get_interpolated_drag_coefficient(velocity)
         drag_acc = utils.get_drag_acc(mass, velocity, area, drag_coeff, atm_density)
         
-        aoa = utils.get_interpolated_aoa(aoa_list, altitude)
+        aoa = utils.get_interpolated_aoa(aoa_list, velocity)
         angles_of_attack.append(aoa)
         
         lift_to_drag_ratio = utils.get_interpolated_lift_to_drag_ratio(aoa)

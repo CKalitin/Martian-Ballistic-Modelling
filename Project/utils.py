@@ -76,8 +76,8 @@ def get_numpy_aoa_list(aoa_list):
     out[:, 1] = out[:, 1][::-1]
     return out
 
-def get_interpolated_aoa(numpy_aoa_list, alt):
-    return np.interp(alt, numpy_aoa_list[:,0], numpy_aoa_list[:,1])
+def get_interpolated_aoa(numpy_aoa_list, vel):
+    return np.interp(vel, numpy_aoa_list[:,0], numpy_aoa_list[:,1])
 
 def get_atmospheric_pressure(alt):
     # alt = meters, atmospheric pressure = Pa

@@ -131,13 +131,14 @@ perserverance = {
     'FlightPathAngleVsTime-label': "Perserverance Flight Path Angle",
 }
 
-# Altitude vs. AoA, interpolated
+# Velocity vs. AoA, interpolated
 curiosity_aoa = [
-    (125000, 0),
-    (40000, 0),
-    (25000, 15),
-    (8000, 15),
-    (5000, -15),
+    (6000, 0),
+    (5600, 12),
+    (4800, 12),
+    (3000, 12),
+    (1200, 17),
+    (500, 10),
     (0, -15)
 ]
 
@@ -153,16 +154,15 @@ curiosity_data = sim.simulate(
     verbose=False,
 )
 
+# Velocity vs. AoA, interpolated
 perserverance_aoa = [
-    (125000, 0),
-    (80000, 0),
-    (60000, 15),
-    (23000, 18.5),
-    (20000, 13),
-    (15000, 5),
-    (13000, 0),
-    (10000, 0),
-    (5000, -15),
+    (6000, 15),
+    (5200, 20),
+    (3000, 15),
+    (2000, 15),
+    (1000, 15),
+    (500, 17),
+    (300, -15),
     (0, -15)
 ]
 
@@ -206,6 +206,6 @@ opportunity_data = sim.simulate(
 """
 
 sim.plot(perserverance_data, "Perserverance Mars Entry Simulation", filename="backtest/Perserverance.png", comparisons=[perserverance], show=False)
-#sim.plot(curiosity_data, "Curiosity Mars Entry Simulation", filename="backtest/Curiosity.png", comparisons=[curiosity, perserverance], show=False)
+sim.plot(curiosity_data, "Curiosity Mars Entry Simulation", filename="backtest/Curiosity.png", comparisons=[curiosity], show=False)
 #sim.plot(phoenix_data, "Phoenix Mars Entry Simulation", filename="backtest/Phoenix.png", comparisons=[phoenix], show=False)
 #sim.plot(opportunity_data, "Opportunity Mars Entry Simulation", filename="backtest/Opportunity.png", comparisons=[opportunity], show=False)

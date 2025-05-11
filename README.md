@@ -9,6 +9,4 @@ Project Blog Post: Soon!
 
 # Todo
 1. Get Tianwen-1 data
-2. Get Perseverance data
-3. Get raw Opportunity data
 4. Model Starship

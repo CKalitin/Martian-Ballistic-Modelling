@@ -19,8 +19,8 @@ phoenix = [
     "Phoenix"
 ]
 
-# MER Entry:
-mer = [
+# Opportunity Entry:
+opportunity = [
     # Velocity (m/s)
     np.array([
     5537, 5548, 5548, 5548, 5559, 5559, 5559, 5548, 5537, 5515, 5481, 5426, 5359, 5259, 5182, 5082, 4960, 4827, 4682, 4549, 4405, 4261, 4117, 3972, 3828, 3673, 3528, 3384, 3307, 2430, 2275, 2119, 1975, 1820, 1675, 1520, 1376, 1232, 1087, 943, 810, 677, 610, 510, 455, 411, 377, 333, 89, 78, 67, 67, 33
@@ -29,7 +29,7 @@ mer = [
     np.array([
     123497, 117486, 112295, 99454, 93443, 87432, 81421, 75683, 69945, 64208, 60383, 57104, 53825, 50820, 48634, 47268, 45355, 43716, 42077, 40984, 39891, 38525, 37705, 36885, 35792, 34973, 34153, 33607, 33060, 28689, 28142, 27322, 26503, 25683, 24863, 24044, 22951, 21858, 20765, 19399, 17760, 15847, 14754, 12568, 11202, 10383, 10383, 10109, 7650, 6831, 3279, 1639, 546
     ]),
-    "MER"
+    "Opportunity"
 ]
 
 # Curiosity Entry:
@@ -71,11 +71,21 @@ viking = [
     "Viking"
 ]
 
-# Curiosity
-sim_data = sim.simulate(
+curiosity_data = sim.simulate(
     time_step=0.01,
     time_max=1000,
-    mass=670,
+    mass=3300,
+    area=15.9,
+    entry_altitude=125000,
+    entry_flight_path_angle=-14,
+    entry_velocity=5850,
+    verbose=False,
+)
+
+phoenix_data = sim.simulate(
+    time_step=0.01,
+    time_max=1000,
+    mass=520,
     area=15.9,
     entry_altitude=125000,
     entry_flight_path_angle=-13,
@@ -83,16 +93,17 @@ sim_data = sim.simulate(
     verbose=False,
 )
 
-# Phoenix
-sim_data = sim.simulate(
+# Opportunity
+opportunity_data = sim.simulate(
     time_step=0.01,
     time_max=1000,
-    mass=3300,
+    mass=827,
     area=15.9,
     entry_altitude=125000,
     entry_flight_path_angle=-14,
-    entry_velocity=5800,
+    entry_velocity=5550,
     verbose=False,
 )
 
-sim.plot(sim_data, filename="backtest/Curiosity-Entry.png", comparisons=[phoenix, mer, curiosity, pathfinder, viking], show=False)
+sim.plot(opportunity_data, "Opportunity Mars Entry Simulation", filename="backtest/Opportunity.png", comparisons=[opportunity], show=False)
+sim.plot(curiosity_data, "Curiosity Mars Entry Simulation", filename="backtest/Curiosity.png", comparisons=[opportunity], show=False)

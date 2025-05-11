@@ -2,8 +2,11 @@ import utils
 import math
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude=None, entry_flight_path_angle=None, entry_velocity=None, verbose=False):
+    start_time = time.time()
+    
     if time_step is None:
         time_step = 1 # seconds
     if time_max is None:
@@ -61,7 +64,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
     while t < time_max and altitude > 0:
         atm_pressure = utils.get_atmospheric_pressure(altitude) # Just for printing
         atm_temperature = utils.get_temperature(altitude) # Just for printing
-        atm_density = utils.get_atmospheric_density(altitude) # Be sure not to use the formula that requires pressure and temp
+        atm_density = utils.get_atmospheric_density_other(altitude, atm_pressure, atm_temperature) # Be sure not to use the formula that requires pressure and temp
         drag_coeff = utils.get_interpolated_drag_coefficient(velocity)
         drag_acc = utils.get_drag_acc(mass, velocity, area, drag_coeff, atm_density)
         
@@ -103,6 +106,8 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
         
         t += time_step
     
+    execution_time = time.time() - start_time
+    
     # Return all data in a dictionary
     return {
         'times': times,
@@ -130,10 +135,11 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, entry_altitude
             'entry_velocity': entry_velocity,
             'time_step': time_step,
             'time_max': time_max
-        }
+        },
+        'execution_time': execution_time
     }
 
-def plot(data, filename='mars_entry_simulation.png', show=False, comparisons=None):
+def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.png', show=False, comparisons=None):
     # Comparisions is a list of tuples (velocity, altitude, label), MAKE SURE ITS A LIST, NOT JUST A TUPLE, USE THE SQUARE BRACKETS
     
     times = data['times']
@@ -153,10 +159,14 @@ def plot(data, filename='mars_entry_simulation.png', show=False, comparisons=Non
     atm_temperatures = data['atm_temperatures']
     atm_densities = data['atm_densities']
     params = data['parameters']
+    execution_time = data['execution_time']
     
     # Create figure
     plt.figure(figsize=(19.20, 10.80), dpi=100)
-    plt.suptitle('Mars Entry Simulation', fontsize=16)
+    plt.suptitle(title, fontsize=16)
+    plt.gcf().text(0.01, 0.965, f"Christopher Kalitin 2025", fontsize=12)
+    # no axis
+    plt.axis('off')
 
     # Plot 1,1: Altitude vs Time
     plt.subplot(3, 3, 1)
@@ -168,7 +178,7 @@ def plot(data, filename='mars_entry_simulation.png', show=False, comparisons=Non
     # Plot 1,2: Altitude vs. Velocity
     plt.subplot(3, 3, 2)
     plt.subplot(3, 3, 2)
-    plt.plot(velocities, altitudes, label='Simulation')
+    plt.plot(velocities, altitudes, label='Simulation', zorder=999)
     if comparisons is not None:
         for vel, alt, label in comparisons:
             plt.plot(vel, alt, '--', label=label)
@@ -216,8 +226,15 @@ def plot(data, filename='mars_entry_simulation.png', show=False, comparisons=Non
     plt.legend()
     plt.grid(True)
 
-    # Plot 3,1: Drag Coefficient and Atmospheric Density vs Time
+    # Plot 3,1: Flight Path Angle vs Time
     plt.subplot(3, 3, 7)
+    plt.plot(times, flight_path_angles)
+    plt.title('Flight Path Angle vs Time')
+    plt.ylabel('Angle (degrees)')
+    plt.grid(True)
+
+    # Plot 3,2: Drag Coefficient and Atmospheric Density vs Time
+    plt.subplot(3, 3, 8)
     ax5_1 = plt.gca()
     ax5_1.plot(times, drag_coeffs, 'b-', label='Drag Coefficient')
     ax5_1.set_title('Drag Coefficient, Atmospheric Pressure, Temperature, Density vs Time')
@@ -230,68 +247,62 @@ def plot(data, filename='mars_entry_simulation.png', show=False, comparisons=Non
     ax5_2.set_ylabel('Pressure (Pa)', color='g')
     ax5_2.tick_params(axis='y', labelcolor='g')
 
+    # chart atmospheric temperature on the left y-axis
     ax5_3 = ax5_1.twinx()
-    ax5_3.spines['right'].set_position(('outward', 60))  # Move the third y-axis outward
-    ax5_3.plot(times, atm_temperatures, 'm-', label='Atmospheric Temperature')
-    ax5_3.set_ylabel('Temperature (K)', color='m')
-    ax5_3.tick_params(axis='y', labelcolor='m')
-    
-    ax5_4 = ax5_1.twinx()
-    ax5_4.spines['right'].set_position(('outward', 120))  # Move the fourth y-axis outward
-    ax5_4.plot(times, atm_densities, 'r-', label='Atmospheric Density')
-    ax5_4.set_ylabel('Density (kg/m³)', color='r')
-    ax5_4.tick_params(axis='y', labelcolor='r')
+    ax5_3.spines['left'].set_position(('outward', 50))  # Move the right spine outward
+    ax5_3.yaxis.tick_left()
+    ax5_3.yaxis.set_label_position('left')
+    ax5_3.spines['left'].set_visible(True)
+    ax5_3.plot(times, atm_temperatures, 'r-', label='Atmospheric Temperature')
+    ax5_3.set_ylabel('Temperature (K)', color='r')
+    ax5_3.tick_params(axis='y', labelcolor='r')
     
     # Add legends for each y-axis
     lines, labels = ax5_1.get_legend_handles_labels()
     lines2, labels2 = ax5_2.get_legend_handles_labels()
     lines3, labels3 = ax5_3.get_legend_handles_labels()
-    lines4, labels4 = ax5_4.get_legend_handles_labels()
-    ax5_1.legend(lines + lines2 + lines3 + lines4, labels + labels2 + labels3 + labels4, loc='upper left')
-
-    # Plot 3,2: Flight Path Angle vs Time
-    plt.subplot(3, 3, 8)
-    plt.plot(times, flight_path_angles)
-    plt.title('Flight Path Angle vs Time')
-    plt.ylabel('Angle (degrees)')
-    plt.grid(True)
+    ax5_1.legend(lines + lines2 + lines3, labels + labels2 + labels3, loc='upper left')
 
     # Plot 3,3: Parameters
     plt.subplot(3, 3, 9)
     plt.axis('off')
-    plt.text(-0.15, 1.0, f"Mass: {params['mass']} kg", fontsize=10)
-    plt.text(-0.15, 0.93, f"Area: {params['area']} m²", fontsize=10)
-    plt.text(-0.15, 0.86, f"Ballistic Coefficient: {params['ballistic_coefficient']:.2f} kg/m²", fontsize=10)
     
-    plt.text(-0.15, 0.76, f"Entry Altitude: {params['entry_altitude']} m", fontsize=10)
-    plt.text(-0.15, 0.69, f"Entry Flight Path Angle: {params['entry_flight_path_angle']} degrees", fontsize=10)
-    plt.text(-0.15, 0.62, f"Entry Velocity: {params['entry_velocity']} m/s", fontsize=10)
+    plt.text(-0.15, 1.0, f"Parameters:", fontsize=10, fontweight='bold')
     
-    plt.text(-0.15, 0.52, f"Time Step: {params['time_step']} second(s)", fontsize=10)
-    plt.text(-0.15, 0.45, f"Max Time: {params['time_max']} seconds", fontsize=10)
+    plt.text(-0.15, 0.91, f"Mass: {params['mass']} kg", fontsize=10)
+    plt.text(-0.15, 0.84, f"Area: {params['area']} m²", fontsize=10)
+    plt.text(-0.15, 0.77, f"Ballistic Coefficient: {params['ballistic_coefficient']:.2f} kg/m²", fontsize=10)
     
-    plt.text(-0.15, 0.14, f"Christopher Kalitin 2025", fontsize=10)
-
+    plt.text(-0.15, 0.67, f"Entry Altitude: {params['entry_altitude']} m", fontsize=10)
+    plt.text(-0.15, 0.60, f"Entry Flight Path Angle: {params['entry_flight_path_angle']} degrees", fontsize=10)
+    plt.text(-0.15, 0.53, f"Entry Velocity: {params['entry_velocity']} m/s", fontsize=10)
+    
+    plt.text(-0.15, 0.43, f"Time Step: {params['time_step']} second(s)", fontsize=10)
+    plt.text(-0.15, 0.36, f"Max Time: {params['time_max']} seconds", fontsize=10)
+    
     # Final values
-    plt.text(0.4, 1.0, f"Final Altitude: {altitudes[-1]:.2f} m", fontsize=10)
-    plt.text(0.4, 0.93, f"Final Downrange Distance: {downrange_dists[-1]:.2f} m", fontsize=10)
+    plt.text(0.4, 1, f"Terminal Values (At Impact):", fontsize=10, fontweight='bold')
+    
+    plt.text(0.4, 0.91, f"Final Altitude: {altitudes[-1]:.2f} m", fontsize=10)
+    plt.text(0.4, 0.84, f"Final Downrange Distance: {downrange_dists[-1]:.2f} m", fontsize=10)
     
     # refactor all below to use -1 index instead of final
-    plt.text(0.4, 0.86, f"Final Velocity: {velocities[-1]:.2f} m/s", fontsize=10)
-    plt.text(0.4, 0.79, f"Final Horizontal Velocity: {v_xs[-1]:.2f} m/s", fontsize=10)
-    plt.text(0.4, 0.72, f"Final Vertical Velocity: {v_ys[-1]:.2f} m/s", fontsize=10)
+    plt.text(0.4, 0.77, f"Final Velocity: {velocities[-1]:.2f} m/s", fontsize=10)
+    plt.text(0.4, 0.70, f"Final Horizontal Velocity: {v_xs[-1]:.2f} m/s", fontsize=10)
+    plt.text(0.4, 0.63, f"Final Vertical Velocity: {v_ys[-1]:.2f} m/s", fontsize=10)
     
-    plt.text(0.4, 0.62, f"Final Acceleration: {net_accs[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.55, f"Final Horizontal Acceleration: {a_xs[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.48, f"Final Vertical Acceleration: {a_ys[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.41, f"Final Drag Acceleration: {drag_accs[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.34, f"Final Gravity Acceleration: {grav_accs[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.53, f"Final Acceleration: {net_accs[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.46, f"Final Horizontal Acceleration: {a_xs[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.39, f"Final Vertical Acceleration: {a_ys[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.32, f"Final Drag Acceleration: {drag_accs[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.25, f"Final Gravity Acceleration: {grav_accs[-1]:.2f} m/s²", fontsize=10)
     
-    plt.text(0.4, 0.24, f"Final Flight Path Angle: {flight_path_angles[-1]:.2f} degrees", fontsize=10)
-    plt.text(0.4, 0.17, f"Final Time: {times[-1]:.2f} seconds", fontsize=10)
+    plt.text(0.4, 0.15, f"Final Flight Path Angle: {flight_path_angles[-1]:.2f} degrees", fontsize=10)
+    plt.text(0.4, 0.08, f"Final Time: {times[-1]:.2f} seconds", fontsize=10)
+    
+    plt.text(0.4, -0.02, f"Execution Time: {execution_time:.2f} seconds", fontsize=10)
 
     # Adjust layout
-    plt.tight_layout()
     plt.subplots_adjust(left=0.055, right=0.98, top=0.925, bottom=0.032, hspace=0.29, wspace=0.31)
 
     # Save the plot
@@ -299,15 +310,4 @@ def plot(data, filename='mars_entry_simulation.png', show=False, comparisons=Non
     if show: plt.show()
     plt.close()
 
-# Example usage
-if __name__ == "__main__":
-    sim_data = simulate(
-        time_step=0.1,
-        time_max=5000,
-        mass=3300,
-        area=15.9,
-        entry_altitude=125000,
-        entry_flight_path_angle=-14,
-        entry_velocity=5800
-    )
-    plot(sim_data, show=True)
+import backtest

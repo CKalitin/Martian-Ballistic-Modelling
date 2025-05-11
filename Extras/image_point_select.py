@@ -2,7 +2,7 @@ import sys
 import pygame
 
 def main():
-    image_file = 'extract_image.png'
+    image_file = 'Historic Lander Data/Perserverance Charts/perserverance-flight-path-angle.jpg'
 
     # Initialize Pygame and minimal display
     pygame.init()
@@ -83,7 +83,9 @@ def main():
     print(f"Image dimensions: {orig_width} x {orig_height}")
     print("Points (x, y):")
     for p in points:
+        p = (p[0], orig_height - 1 - p[1]) # For a y range of 655, you get 0-654, so subtract 1
         print(p)
+    print(f"Image dimensions: {orig_width} x {orig_height}")
 
 if __name__ == '__main__':
     main()

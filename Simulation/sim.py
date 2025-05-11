@@ -172,18 +172,23 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
 
     # Plot 1,1: Altitude vs Time
     plt.subplot(3, 3, 1)
-    plt.plot(times, altitudes)
+    plt.plot(times, altitudes, label='Simulation', zorder=999)
+    for comparison in comparisons:
+        if 'AltVsTime-time' in comparison:
+            plt.plot(comparison['AltVsTime-time'], comparison['AltVsTime-alt'], '--', label=comparison['label'])
     plt.title('Altitude vs Time')
     plt.ylabel('Altitude (m)')
+    plt.xlabel('Time (s)')
+    plt.legend()
     plt.grid(True)
 
     # Plot 1,2: Altitude vs. Velocity
     plt.subplot(3, 3, 2)
     plt.subplot(3, 3, 2)
     plt.plot(velocities, altitudes, label='Simulation', zorder=999)
-    if comparisons is not None:
-        for vel, alt, label in comparisons:
-            plt.plot(vel, alt, '--', label=label)
+    for comparison in comparisons:
+        if 'AltVsVel-vel' in comparison:
+            plt.plot(comparison['AltVsVel-vel'], comparison['AltVsVel-alt'], '--', label=comparison['label'])
     plt.title('Altitude vs Velocity')
     plt.xlabel('Velocity (m/s)')
     plt.ylabel('Altitude (m)')
@@ -192,7 +197,10 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
 
     # Plot 1,3: Altitude vs Downrange Distance
     plt.subplot(3, 3, 3)
-    plt.plot(downrange_dists, altitudes)
+    plt.plot(downrange_dists, altitudes, label='Simulation', zorder=999)
+    for comparison in comparisons:
+        if 'AltVsDownrangeDist-dist' in comparison:
+            plt.plot(comparison['AltVsDownrangeDist-dist'], comparison['AltVsDownrangeDist-alt'], '--', label=comparison['label'])
     plt.title('Altitude vs Downrange Distance')
     plt.xlabel('Downrange Distance (m)')
     plt.ylabel('Altitude (m)')
@@ -200,11 +208,19 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     
     # Plot 2,1: Velocities vs Time
     plt.subplot(3, 3, 4)
-    plt.plot(times, velocities, label='Total Velocity')
-    plt.plot(times, v_xs, label='Horizontal Velocity')
-    plt.plot(times, v_ys, label='Vertical Velocity')
+    plt.plot(times, velocities, label='Total Velocity', zorder=999)
+    plt.plot(times, v_xs, label='Horizontal Velocity', zorder=998)
+    plt.plot(times, v_ys, label='Vertical Velocity', zorder=997)
+    for comparison in comparisons:
+        if 'VelVsTime-time' in comparison:
+            plt.plot(comparison['VelVsTime-time'], comparison['VelVsTime-vel'], '--', label=comparison['VelVsTime-label'])
+        if 'VVelVsTime-vel' in comparison:
+            plt.plot(comparison['VVelVsTime-time'], comparison['VVelVsTime-vel'], '--', label=comparison['VVelVsTime-label'])
+        if 'HVelVsTime-vel' in comparison:
+            plt.plot(comparison['HVelVsTime-time'], comparison['HVelVsTime-vel'], '--', label=comparison['HVelVsTime-label'])
     plt.title('Velocities vs Time')
     plt.ylabel('Velocity (m/s)')
+    plt.xlabel('Time (s)')
     plt.legend()
     plt.grid(True)
 
@@ -215,6 +231,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     plt.plot(times, net_accs, label='Net Acceleration')
     plt.title('Accelerations vs Time')
     plt.ylabel('Acceleration (m/s²)')
+    plt.xlabel('Time (s)')
     plt.legend()
     plt.grid(True)
 
@@ -226,6 +243,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     plt.plot(times, net_accs, label='Net Acceleration')
     plt.title('Drag, Lift, Gravity Acceleration vs Time')
     plt.ylabel('Acceleration (m/s²)')
+    plt.xlabel('Time (s)')
     plt.legend()
     plt.grid(True)
 
@@ -233,8 +251,21 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     plt.subplot(3, 3, 7)
     plt.plot(times, flight_path_angles, label='Flight Path Angle')
     plt.plot(times, angles_of_attack, label='Angle of Attack')
+    if comparisons:
+        for comparison in comparisons:
+            if 'AoAVsTime-time' in comparison:
+                if 'AoAVsTime-label' in comparison:
+                    plt.plot(comparison['AoAVsTime-time'], comparison['AoAVsTime-aoa'], '--', label=comparison['AoAVsTime-label'])
+                else:
+                    plt.plot(comparison['AoAVsTime-time'], comparison['AoAVsTime-aoa'], '--', label=comparison['label'])
+            if 'FlightPathAngleVsTime-time' in comparison:
+                if 'FlightPathAngleVsTime-label' in comparison:
+                    plt.plot(comparison['FlightPathAngleVsTime-time'], comparison['FlightPathAngleVsTime-fpa'], '--', label=comparison['FlightPathAngleVsTime-label'])
+                else:
+                    plt.plot(comparison['FlightPathAngleVsTime-time'], comparison['FlightPathAngleVsTime-fpa'], '--', label=comparison['label'])
     plt.title('Flight Path Angle and Angle of Attack vs Time')
     plt.ylabel('Angle (degrees)')
+    plt.xlabel('Time (s)')
     plt.legend()
     plt.grid(True)
 
@@ -267,6 +298,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     lines2, labels2 = ax5_2.get_legend_handles_labels()
     lines3, labels3 = ax5_3.get_legend_handles_labels()
     ax5_1.legend(lines + lines2 + lines3, labels + labels2 + labels3, loc='upper left')
+    ax5_1.set_xlabel('Time (s)')
 
     # Plot 3,3: Parameters
     plt.subplot(3, 3, 9)
@@ -308,7 +340,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     plt.text(0.4, -0.02, f"Execution Time: {execution_time:.2f} seconds", fontsize=10)
 
     # Adjust layout
-    plt.subplots_adjust(left=0.055, right=0.98, top=0.925, bottom=0.032, hspace=0.29, wspace=0.31)
+    plt.subplots_adjust(left=0.055, right=0.98, top=0.925, bottom=0.042, hspace=0.29, wspace=0.31)
 
     # Save the plot
     plt.savefig(filename)

@@ -85,11 +85,11 @@ curiosity_data = sim.simulate(
 phoenix_data = sim.simulate(
     time_step=0.01,
     time_max=1000,
-    mass=520,
+    mass=670,
     area=15.9,
     entry_altitude=125000,
-    entry_flight_path_angle=-13,
-    entry_velocity=5600,
+    entry_flight_path_angle=-15,
+    entry_velocity=5875,
     verbose=False,
 )
 
@@ -105,5 +105,6 @@ opportunity_data = sim.simulate(
     verbose=False,
 )
 
+sim.plot(phoenix_data, "Phoenix Mars Entry Simulation", filename="backtest/Phoenix.png", comparisons=[phoenix], show=False)
+sim.plot(curiosity_data, "Curiosity Mars Entry Simulation", filename="backtest/Curiosity.png", comparisons=[curiosity], show=False)
 sim.plot(opportunity_data, "Opportunity Mars Entry Simulation", filename="backtest/Opportunity.png", comparisons=[opportunity], show=False)
-sim.plot(curiosity_data, "Curiosity Mars Entry Simulation", filename="backtest/Curiosity.png", comparisons=[opportunity], show=False)

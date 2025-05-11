@@ -19,11 +19,11 @@ cd_vel_data = np.array([
 
 # Lift to drag ratio data, lift to drag ratio vs. AoA (degrees)
 ld_ratio_data = np.array([
-    
+    0,0.035,0.065,0.095,0.175,0.265,0.265
 ])
 
 ld_vel_data = np.array([
-    
+    0,2,4,6,11,16,90
 ])
 
 # Atmospheric pressure data, pressure vs. altitude (m)
@@ -60,6 +60,24 @@ def get_interpolated_drag_coefficient(vel):
     
     # Since velocity_data is in descending order, reverse for np.interp
     return np.interp(vel, cd_vel_data[::-1], cd_drag_coeff_data[::-1])
+
+def get_interpolated_lift_to_drag_ratio(aoa):
+    # aoa = degrees
+    if aoa < ld_vel_data[0] or aoa > ld_vel_data[-1]:
+        raise ValueError(f"Angle of attack {aoa} degrees is outside the data range [{ld_vel_data[-1]}, {ld_vel_data[0]}] degrees")
+    
+    return np.interp(aoa, ld_vel_data, ld_ratio_data)
+
+print(get_interpolated_lift_to_drag_ratio(2))
+print(get_interpolated_lift_to_drag_ratio(4))
+print(get_interpolated_lift_to_drag_ratio(6))
+print(get_interpolated_lift_to_drag_ratio(8))
+print(get_interpolated_lift_to_drag_ratio(10))
+print(get_interpolated_lift_to_drag_ratio(12))
+print(get_interpolated_lift_to_drag_ratio(14))
+print(get_interpolated_lift_to_drag_ratio(16))
+print(get_interpolated_lift_to_drag_ratio(18))
+print(get_interpolated_lift_to_drag_ratio(20))
 
 def get_atmospheric_pressure(alt):
     # alt = meters, atmospheric pressure = Pa

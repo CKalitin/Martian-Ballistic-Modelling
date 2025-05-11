@@ -224,7 +224,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     plt.plot(times, lift_accs, label='Lift Acceleration')
     plt.plot(times, grav_accs, label='Gravity Acceleration')
     plt.plot(times, net_accs, label='Net Acceleration')
-    plt.title('Drag and Gravity Acceleration vs Time')
+    plt.title('Drag, Lift, Gravity Acceleration vs Time')
     plt.ylabel('Acceleration (m/s²)')
     plt.legend()
     plt.grid(True)

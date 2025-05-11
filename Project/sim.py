@@ -141,6 +141,8 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
 
 def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.png', show=False, comparisons=None):
     # Comparisions is a list of tuples (velocity, altitude, label), MAKE SURE ITS A LIST, NOT JUST A TUPLE, USE THE SQUARE BRACKETS
+    if comparisons is None:
+        comparisons = []
     
     times = data['times']
     altitudes = data['altitudes']

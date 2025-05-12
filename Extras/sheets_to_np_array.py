@@ -135,4 +135,4 @@ if __name__ == "__main__":
     """
     
 vel,alt = parse_vel_alt(raw_data)
-print(format_for_python("Perserverance", vel, alt))
+print(format_for_python("Perseverance", vel, alt))

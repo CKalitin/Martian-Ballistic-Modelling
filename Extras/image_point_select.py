@@ -2,7 +2,7 @@ import sys
 import pygame
 
 def main():
-    image_file = 'Historic Lander Data/Perserverance Charts/perserverance-flight-path-angle.jpg'
+    image_file = 'Historic Lander Data/Perseverance Charts/perseverance-flight-path-angle.jpg'
 
     # Initialize Pygame and minimal display
     pygame.init()

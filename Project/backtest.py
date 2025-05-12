@@ -71,9 +71,9 @@ viking = {
     ])
 }
 
-# Perserverance Entry:
-perserverance = {
-    'label': "Perserverance",
+# Perseverance Entry:
+perseverance = {
+    'label': "Perseverance",
     # Velocity (m/s)
     'AltVsVel-vel': np.array([
     5332, 5340, 5348, 5359, 5356, 5322, 5176, 4715, 3861, 2924, 2185, 1677, 1385, 1150, 998, 880, 780, 705, 646, 595, 549, 505, 474, 452, 306, 184, 141, 115, 102, 93, 88, 85, 83, 81, 78, 76, 73, 61, 26, 0, 0
@@ -94,28 +94,28 @@ perserverance = {
     'VelVsTime-vel': np.array([
         5332, 5340, 5348, 5359, 5356, 5322, 5176, 4715, 3861, 2924, 2185, 1677, 1385, 1150, 998, 880, 780, 705, 646, 595, 549, 505, 474, 452, 306, 184, 141, 115, 102, 93, 88, 85, 83, 81, 78, 76, 73, 61, 26, 0, 0
     ]),
-    'VelVsTime-label': "Perserverance Vel.",
+    'VelVsTime-label': "Perseverance Vel.",
     'AoAVsTime-time': np.array([
         30, 54, 89, 133, 175, 218, 224, 230, 236
     ]),
     'AoAVsTime-aoa': np.array([
         18, 16, 18, 19, 20, 21, 8, -2, 1
     ]),
-    'AoAVsTime-label': "Perserverance AoA",
+    'AoAVsTime-label': "Perseverance AoA",
     'VVelVsTime-time': np.array([
         0, 6, 30, 49, 59, 64, 69, 73, 76, 80, 81, 85, 86, 88, 92, 95, 98, 102, 110, 124, 129, 143, 159, 172, 186, 203, 217, 226, 234, 244, 258, 270, 282, 305, 334, 356, 368, 380, 389, 392, 408
     ]),
     'VVelVsTime-vel': np.array([
         -1514, -1487, -1365, -1263, -1168, -1097, -1008, -919, -836, -708, -651, -555, -491, -440, -376, -306, -255, -197, -140, -102, -95, -89, -95, -108, -127, -153, -172, -197, -217, -178, -172, -178, -191, -185, -178, -172, -153, -127, -121, -102, -95
     ]),
-    'VVelVsTime-label': "Perserverance Vertical Vel.",
+    'VVelVsTime-label': "Perseverance Vertical Vel.",
     'HVelVsTime-time': np.array([
         0, 4, 9, 14, 19, 24, 29, 34, 39, 44, 49, 54, 59, 64, 69, 74, 79, 84, 89, 94, 99, 104, 109, 114, 119, 124, 129, 134, 139, 144, 149, 154, 159, 164, 169, 174, 179, 184, 189, 194, 199, 204, 209, 214, 219, 224, 229, 234, 239, 244, 249, 254, 259, 264, 269, 274, 279, 284, 289, 294, 299, 304, 309, 314, 319, 324, 329, 334, 339, 344, 349, 354, 359, 364, 369, 374, 379, 384, 389, 394, 399, 404, 409, 414
     ]),
     'HVelVsTime-vel': np.array([
         5127, 5138, 5149, 5161, 5173, 5182, 5190, 5198, 5199, 5190, 5182, 5137, 5071, 4926, 4692, 4301, 3827, 3414, 2939, 2561, 2178, 1932, 1732, 1534, 1381, 1267, 1164, 1077, 1002, 940, 884, 839, 794, 753, 715, 678, 649, 620, 591, 570, 551, 533, 514, 495, 475, 455, 436, 418, 314, 218, 174, 141, 121, 101, 82, 65, 49, 35, 30, 28, 26, 26, 27, 25, 23, 21, 13, 5, 0, 3, 5, 8, 13, 31, 36, 32, 13, 5, 7, 10, 12, 15, 17, 19
     ]),
-    'HVelVsTime-label': "Perserverance Horizontal Vel.",
+    'HVelVsTime-label': "Perseverance Horizontal Vel.",
     'AltVsDownrangeDist-dist': np.array([
         0, 25669, 51397, 77184, 103031, 128928, 154866, 180843, 206835, 232799, 258717, 284467, 309913, 334751, 358545, 380626, 400476, 418157, 433572, 446941, 458418, 468450, 477410, 485380, 492518, 499024, 505000, 510516, 515640, 520433, 524938, 529200, 533238, 537064, 540696, 544142, 547431, 550574, 553573, 556455, 559238, 561930, 564529, 567032, 569437, 571742, 573950, 576058, 577785, 579024, 579960, 580716, 581351, 581886, 582325, 582675, 582944, 583141, 583299, 583442, 583575, 583705, 583838, 583966, 584084, 584192, 584269, 584306, 584314, 584325, 584347, 584382, 584441, 584568, 584740, 584904, 584999, 585037, 585069, 585114
     ]),
@@ -128,7 +128,7 @@ perserverance = {
     'FlightPathAngleVsTime-fpa': np.array([
         -16, -13, -13, -11, -9, -7, -5, -4, -2, -1, -1, 0, 0, 0, -1, -3, -5, -8, -12, -16, -18, -20, -22, -25, -27, -30, -31, -33, -35, -40, -45, -49, -53, -60, -66, -67, -69, -70, -72, -73, -72, -73, -74, -76, -78, -81, -81, -80, -81, -82, -81, -77, -74, -64, -57, -53, -52, -54, -60, -65, -71, -79, -86, -90, -90, -83, -88, -80, -75, -63
     ]),
-    'FlightPathAngleVsTime-label': "Perserverance Flight Path Angle",
+    'FlightPathAngleVsTime-label': "Perseverance Flight Path Angle",
 }
 
 # Velocity vs. AoA, interpolated
@@ -155,7 +155,7 @@ curiosity_data = sim.simulate(
 )
 
 # Velocity vs. AoA, interpolated
-perserverance_aoa = [
+perseverance_aoa = [
     (6000, 15),
     (5200, 20),
     (3000, 15),
@@ -166,12 +166,12 @@ perserverance_aoa = [
     (0, -15)
 ]
 
-perserverance_data = sim.simulate(
+perseverance_data = sim.simulate(
     time_step=0.01,
     time_max=1000,
     mass=3110,
     area=15.9,
-    aoa=perserverance_aoa,
+    aoa=perseverance_aoa,
     entry_altitude=125000,
     entry_flight_path_angle=-12.5, # The real number should be -16 from the velocity component data, but this is a better fit for alt vs. vel, but not alt vs. downrange dist
     entry_velocity=5350,
@@ -205,7 +205,7 @@ opportunity_data = sim.simulate(
 )
 """
 
-sim.plot(perserverance_data, "Perserverance Mars Entry Simulation", filename="backtest/Perserverance.png", comparisons=[perserverance], show=False)
+sim.plot(perseverance_data, "Perseverance Mars Entry Simulation", filename="backtest/Perseverance.png", comparisons=[perseverance], show=False)
 sim.plot(curiosity_data, "Curiosity Mars Entry Simulation", filename="backtest/Curiosity.png", comparisons=[curiosity], show=False)
 #sim.plot(phoenix_data, "Phoenix Mars Entry Simulation", filename="backtest/Phoenix.png", comparisons=[phoenix], show=False)
 #sim.plot(opportunity_data, "Opportunity Mars Entry Simulation", filename="backtest/Opportunity.png", comparisons=[opportunity], show=False)

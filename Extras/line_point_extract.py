@@ -8,7 +8,7 @@ except ImportError:
     skeletonize = None
 
 # --- User-Configurable Variables ---
-image_path = 'Perserverance Charts/perserverance-alt.jpg'   # Path to your input chart image
+image_path = 'Perseverance Charts/perseverance-alt.jpg'   # Path to your input chart image
 # Set your target HSV color (hue: 0-179, sat: 0-255, val: 0-255)
 target_hsv = (int(240/2), int(100*2.55), int(0*2.55))
 # HSV tolerance around target: (hue_range, sat_range, val_range)

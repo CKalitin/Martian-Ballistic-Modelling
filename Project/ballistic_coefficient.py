@@ -14,11 +14,11 @@ area = 1
 
 # ballistic coefficients and corresponding masses
 ballistic_coefficients = [1,3.7,10,52,100,196,400,1000,3700,10000,37000,100000]
-masses = [bc * area for bc in ballistic_coefficients]
+masses = [bc * area for bc in ballistic_coefficients] 
 
 # annotations
 annotation_indexes = [3,5,6]
-annotation_aoas = [0,20, 30]
+annotation_aoas = [0,20,30]
 annotation_labels = ['Opportunity','Perseverance','Starship']
 
 # sweep AoA from -25 to +25 in 5° increments
@@ -55,7 +55,7 @@ for i, bc in enumerate(ballistic_coefficients):
     print(f"{bc}," + ",".join(row))
 
 # combined log–log plot
-plt.figure(figsize=(10, 6), dpi=100)
+plt.figure(figsize=(9.6, 5.4), dpi=200)
 for aoa in aoa_list:
     plt.plot(ballistic_coefficients, results[aoa], marker='.', label=f"AoA {aoa}°")
 
@@ -63,7 +63,7 @@ plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('Ballistic Coefficient (kg/m²)')
 plt.ylabel('Terminal Velocity (m/s)')
-plt.title('Mars Entry Terminal Velocity vs Ballistic Coefficient (all AoA)')
+plt.title('Blunt Body Mars Entry Vehicle Terminal Velocity vs Ballistic Coefficient')
 plt.grid(True, which='both', ls='--', alpha=0.5)
 
 # annotate special points for one of the AoA series (e.g. AoA=0)
@@ -84,7 +84,7 @@ textbox_text = f"""
     AoA is purely in the vertical plane.    
 """
 
-plt.text(0.625, 0.315, textbox_text,
+plt.text(0.620, 0.325, textbox_text,
          transform=plt.gca().transAxes, fontsize=10,
          verticalalignment='top', horizontalalignment='left',
          bbox=dict(boxstyle="round,pad=0.2", edgecolor='black', facecolor='white'))

@@ -55,7 +55,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
     while t < time_max and altitude > 0:
         atm_pressure = utils.get_atmospheric_pressure(altitude) # Just for printing
         atm_temperature = utils.get_temperature(altitude) # Just for printing
-        atm_density = utils.get_atmospheric_density_other(altitude, atm_pressure, atm_temperature) # Be sure not to use the formula that requires pressure and temp
+        atm_density = utils.get_atmospheric_density(altitude, atm_pressure, atm_temperature) # Be sure not to use the formula that requires pressure and temp
         drag_coeff = utils.get_interpolated_drag_coefficient(velocity)
         drag_acc = utils.get_drag_acc(mass, velocity, area, drag_coeff, atm_density)
         

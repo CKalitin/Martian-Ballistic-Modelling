@@ -90,14 +90,14 @@ def get_temperature(alt):
     # alt = meters, temperature = K
     return np.interp(alt, temp_alt_data, temp_data)
 
-def get_atmospheric_density(alt):
+def get_atmospheric_densit_simple(alt):
     # alt = meters, atmospheric density = kg/m^3
     surface_density = 0.0215 # kg/m^3 at sea level on Mars  
     scale_height = 10000  # Scale height in meters
     return surface_density * np.exp(-alt / scale_height)
 
 # Alternative formula that gives default value of ~0.015, not using this one
-def get_atmospheric_density_other(alt, pressure=None, temperature=None):
+def get_atmospheric_density(alt, pressure=None, temperature=None):
     # alt = meters, pressure = Pa, temperature = K, atmospheric density = kg/m^3
     if pressure is None:
         pressure = get_atmospheric_pressure(alt)

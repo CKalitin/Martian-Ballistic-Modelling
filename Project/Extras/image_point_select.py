@@ -2,7 +2,7 @@ import sys
 import pygame
 
 def main():
-    image_file = 'Historic Lander Data/Perseverance Charts/perseverance-flight-path-angle.jpg'
+    image_file = 'Historic Lander Data/Starship/2017-Simulated-BFR-Mars-Entry.png'
 
     # Initialize Pygame and minimal display
     pygame.init()

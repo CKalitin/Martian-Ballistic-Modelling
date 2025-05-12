@@ -287,7 +287,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
 
     # chart atmospheric temperature on the left y-axis
     ax5_3 = ax5_1.twinx()
-    ax5_3.spines['left'].set_position(('outward', 50))  # Move the right spine outward
+    ax5_3.spines['left'].set_position(('outward', 55))  # Move the right spine outward
     ax5_3.yaxis.tick_left()
     ax5_3.yaxis.set_label_position('left')
     ax5_3.spines['left'].set_visible(True)
@@ -348,5 +348,3 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     plt.savefig(filename)
     if show: plt.show()
     plt.close()
-
-import backtest

@@ -131,6 +131,19 @@ perseverance = {
     'FlightPathAngleVsTime-label': "Perseverance Flight Path Angle",
 }
 
+# Starship Entry:
+starship = {
+    'label': "Starship 2017 Simulation",
+    # Velocity (m/s)
+    'AltVsVel-vel': np.array([
+    0, 73, 147, 275, 386, 514, 533, 569, 606, 643, 680, 753, 845, 919, 1029, 1158, 1286, 1397, 1507, 1599, 1709, 1819, 1985, 2132, 2316, 2481, 2628, 2812, 2996, 3125, 3253, 3382, 3529, 3639, 3750, 3878, 3970, 4080, 4209, 4393, 4558, 4705, 4852, 5091, 5257, 5422, 5625, 5845, 6066, 6305, 6488, 6691, 6875, 7022, 7169, 7242, 7297, 7352, 7389, 7408, 7426, 7444, 7463, 7463, 7481, 7481
+    ]),
+    # Altitude (m)
+    'AltVsVel-alt': np.array([
+    0, 535, 803, 1205, 1741, 2410, 4419, 6562, 7633, 8839, 9508, 9910, 9642, 8973, 7901, 6696, 5758, 5089, 4687, 4553, 4419, 4553, 4955, 5491, 6428, 7366, 8437, 9910, 11785, 13258, 14732, 16071, 17812, 19017, 20223, 21562, 22500, 23705, 24910, 26651, 28125, 29330, 30401, 32008, 32946, 33750, 34419, 34955, 35357, 35758, 36160, 36830, 37767, 38839, 40446, 41785, 43125, 44732, 46473, 47410, 48883, 50491, 52366, 54776, 58125, 59866
+    ])
+}
+
 # Velocity vs. AoA, interpolated
 curiosity_aoa = [
     (6000, 0),
@@ -178,7 +191,6 @@ perseverance_data = sim.simulate(
     verbose=False,
 )
 
-"""
 phoenix_data = sim.simulate(
     time_step=0.01,
     time_max=1000,
@@ -203,9 +215,36 @@ opportunity_data = sim.simulate(
     entry_velocity=5550,
     verbose=False,
 )
-"""
 
-sim.plot(perseverance_data, "Perseverance Mars Entry Simulation", filename="backtest/Perseverance.png", comparisons=[perseverance], show=False)
-sim.plot(curiosity_data, "Curiosity Mars Entry Simulation", filename="backtest/Curiosity.png", comparisons=[curiosity], show=False)
-#sim.plot(phoenix_data, "Phoenix Mars Entry Simulation", filename="backtest/Phoenix.png", comparisons=[phoenix], show=False)
-#sim.plot(opportunity_data, "Opportunity Mars Entry Simulation", filename="backtest/Opportunity.png", comparisons=[opportunity], show=False)
+# Starship
+starship_aoa = [
+    (7600, 65),
+    (6600, 65),
+    (6000, 0),
+    (5500, 0),
+    (4500, -30),
+    (2300, 0),
+    (1600, 50),
+    (800, 20),
+    (500, 0),
+    (300, 0)
+]
+# Fitting to the Starship trajectory is actually not ideal, it starts its burn way too early, ~500m/s. I can do better!
+
+starship_data = sim.simulate(
+    time_step=0.01,
+    time_max=1000,
+    mass=200000,
+    area=481,
+    aoa=starship_aoa,
+    entry_altitude=125000,
+    entry_flight_path_angle=-10,
+    entry_velocity=7500,
+    verbose=False,
+)
+
+sim.plot(perseverance_data, "Perseverance Mars Entry Simulation", filename="Historic Lander Charts/Perseverance.png", comparisons=[perseverance], show=False)
+sim.plot(curiosity_data, "Curiosity Mars Entry Simulation", filename="Historic Lander Charts/Curiosity.png", comparisons=[curiosity], show=False)
+sim.plot(phoenix_data, "Phoenix Mars Entry Simulation", filename="Historic Lander Charts/Phoenix.png", comparisons=[phoenix], show=False)
+sim.plot(opportunity_data, "Opportunity Mars Entry Simulation", filename="Historic Lander Charts/Opportunity.png", comparisons=[opportunity], show=False)
+sim.plot(starship_data, "Starship Mars Entry Simulation", filename="Historic Lander Charts/Starship.png", comparisons=[starship], show=False)

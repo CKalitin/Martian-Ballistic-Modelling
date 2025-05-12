@@ -186,7 +186,6 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
 
     # Plot 1,2: Altitude vs. Velocity
     plt.subplot(3, 3, 2)
-    plt.subplot(3, 3, 2)
     plt.plot(velocities, altitudes, label='Simulation', zorder=999)
     for comparison in comparisons:
         if 'AltVsVel-vel' in comparison:

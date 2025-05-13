@@ -117,10 +117,6 @@ def get_gravity_acc(alt):
     
     return -gravitational_constant * (mars_mass) / (distance ** 2)
 
-def get_drag_acc(alt, vel, area, mass):
-    # alt = meters, vel = m/s, area = m^2, mass = kg
-    return -1/mass * 0.5 * get_atmospheric_density(alt) * get_interpolated_drag_coefficient(vel) * area * vel**2
-
 def get_drag_acc(mass, vel, area, drag_coeff, atm_density):
     # atm_density = kg/m^3, vel = m/s, area = m^2, drag_coeff = dimensionless
     return -1/mass * 0.5 * atm_density * drag_coeff * area * vel**2

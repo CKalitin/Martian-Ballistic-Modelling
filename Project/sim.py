@@ -53,9 +53,9 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
 
     t = 0
     while t < time_max and altitude > 0:
-        atm_pressure = utils.get_atmospheric_pressure(altitude) # Just for printing
-        atm_temperature = utils.get_temperature(altitude) # Just for printing
-        atm_density = utils.get_atmospheric_density(altitude, atm_pressure, atm_temperature) # Be sure not to use the formula that requires pressure and temp
+        atm_pressure = utils.get_atmospheric_pressure(altitude)
+        atm_temperature = utils.get_temperature(altitude)
+        atm_density = utils.get_atmospheric_density(altitude, atm_pressure, atm_temperature)
         drag_coeff = utils.get_interpolated_drag_coefficient(velocity)
         drag_acc = utils.get_drag_acc(mass, velocity, area, drag_coeff, atm_density)
         
@@ -73,15 +73,15 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
         v_x += a_x * time_step
         v_y += a_y * time_step
         
-        net_acc = math.sqrt(a_x**2 + a_y**2)
-        velocity = math.sqrt(v_x**2 + v_y**2)
-        
         downrange_distance += v_x * time_step
         downrange_dists.append(downrange_distance)
         
         altitude += v_y * time_step
         
         flight_path_angle = math.degrees(math.atan2(v_y, v_x))
+        
+        net_acc = math.sqrt(a_x**2 + a_y**2)
+        velocity = math.sqrt(v_x**2 + v_y**2)
         
         times.append(t)
         altitudes.append(altitude)

@@ -347,3 +347,20 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     plt.savefig(filename)
     if show: plt.show()
     plt.close()
+    
+# example with BC of 100
+
+data = simulate(
+    time_step=0.1,
+    time_max=100,
+    mass=1000,
+    area=10,
+    aoa=0,
+    entry_altitude=100000,
+    entry_flight_path_angle=-15,
+    entry_velocity=6000,
+    verbose=False
+)
+
+# plot it
+plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.png', show=True)

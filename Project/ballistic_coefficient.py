@@ -22,7 +22,7 @@ annotation_aoas = [0,20,30]
 annotation_labels = ['Opportunity','Perseverance','Starship']
 
 # sweep AoA from -25 to +25 in 5° increments
-aoa_list = list(range(0, 90, 10))
+aoa_list = list(range(0, 40, 10))
 
 # store terminal velocities for each AoA
 results = {}
@@ -62,8 +62,8 @@ for aoa in aoa_list:
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('Ballistic Coefficient (kg/m²)')
-plt.ylabel('Terminal Velocity (m/s)')
-plt.title('Blunt Body Mars Entry Vehicle Terminal Velocity vs Ballistic Coefficient')
+plt.ylabel('Impact Velocity (m/s)')
+plt.title('Blunt Body Mars Entry Vehicle Impact Velocity vs Ballistic Coefficient')
 plt.grid(True, which='both', ls='--', alpha=0.5)
 
 # annotate special points for one of the AoA series (e.g. AoA=0)

@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
+MARS_RADIUS = 3389500 # meters
+
 def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entry_altitude=None, entry_flight_path_angle=None, entry_velocity=None, verbose=False):
     start_time = time.time()
 
@@ -22,6 +24,8 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
 
     downrange_distance = 0
 
+    net_surface_y_dist = 0 # How far we've fallen along the curvature of Mars relative to starting point (ie the surface falling from under us)
+
     times = []
     altitudes = []
     velocities = []
@@ -32,6 +36,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
     a_xs = []
     a_ys = []
     downrange_dists = []
+    net_surface_y_dists = []
     net_accs = []
     drag_accs = []
     lift_accs = []
@@ -78,6 +83,11 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
         
         altitude += v_y * time_step
         
+        surface_y_dist = -MARS_RADIUS + math.sqrt(MARS_RADIUS**2 - (v_x * time_step)**2) # This is how far the surface has fallen from under us in this frame
+        altitude -= surface_y_dist # Make Mars round
+        net_surface_y_dist -= surface_y_dist
+        net_surface_y_dists.append(net_surface_y_dist)
+        
         flight_path_angle = math.degrees(math.atan2(v_y, v_x))
         
         net_acc = math.sqrt(a_x**2 + a_y**2)
@@ -118,6 +128,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
         'a_xs': a_xs,
         'a_ys': a_ys,
         'downrange_dists': downrange_dists,
+        'net_surface_y_dists': net_surface_y_dists,
         'net_accs': net_accs,
         'drag_accs': drag_accs,
         'lift_accs': lift_accs,
@@ -154,6 +165,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     a_xs = data['a_xs']
     a_ys = data['a_ys']
     downrange_dists = data['downrange_dists']
+    net_surface_y_dists = data['net_surface_y_dists']
     net_accs = data['net_accs']
     drag_accs = data['drag_accs']
     lift_accs = data['lift_accs']
@@ -195,16 +207,15 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     plt.ylabel('Altitude (m)')
     plt.legend()
     plt.grid(True)
-
+    
     # Plot 1,3: Altitude vs Downrange Distance
     plt.subplot(3, 3, 3)
-    plt.plot(downrange_dists, altitudes, label='Simulation', zorder=999)
+    plt.plot(downrange_dists, net_surface_y_dists, label='Altitude vs Downrange', zorder=999)
     for comparison in comparisons:
         if 'AltVsDownrangeDist-dist' in comparison:
             plt.plot(comparison['AltVsDownrangeDist-dist'], comparison['AltVsDownrangeDist-alt'], '--', label=comparison['label'])
     plt.title('Altitude vs Downrange Distance')
     plt.xlabel('Downrange Distance (m)')
-    plt.ylabel('Altitude (m)')
     plt.grid(True)
     
     # Plot 2,1: Velocities vs Time
@@ -352,7 +363,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
 
 data = simulate(
     time_step=0.1,
-    time_max=100,
+    time_max=1000,
     mass=1000,
     area=10,
     aoa=0,
@@ -363,4 +374,4 @@ data = simulate(
 )
 
 # plot it
-plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.png', show=True)
+plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.png', show=False)

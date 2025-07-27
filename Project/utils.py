@@ -1,5 +1,7 @@
 import numpy as np
 
+MARS_RADIUS = 3396200  # Mars radius in meters
+
 # Coefficient of drag data, drag coefficient vs. velocity (m/s)
 cd_drag_coeff_data = np.array([
     1.73, 1.72, 1.71, 1.71, 1.72, 1.73, 1.73, 1.73, 1.73, 1.73,

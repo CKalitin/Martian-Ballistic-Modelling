@@ -36,7 +36,8 @@ def sub_plot(position, title, x_label, y_label, x_data, y_data_list, series_labe
         for x_key, y_key in zip(comparison_x_key, comparison_y_keys):
             if x_key in comparison and y_key in comparison:
                 label_field = comparison_label_field if comparison_label_field in comparison else 'label' # I FUCKING LOVE PYTHON
-                plt.plot(comparison[x_key], comparison[y_key], '--', label=comparison[label_field], zorder=zorder)
+                line_style = (5, (10, 3)) if y_key == "body_points_y" else '--' # Hardcode Mars line style, see https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html
+                plt.plot(comparison[x_key], comparison[y_key], linestyle=line_style, label=comparison[label_field], zorder=zorder)
                 zorder -= 1
                 
     if equal_aspect:

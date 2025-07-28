@@ -1,5 +1,32 @@
-import sim
+import math
 import numpy as np
+
+import sim_polar
+import utils_data
+
+def alt_vs_downrange_to_global_cartesian(comparison):
+    """
+    Converts altitude vs downrange distance data from a comparison dictionary
+    to global Cartesian coordinates, modifying the dictionary in place.
+    """
+
+    # Convert to Cartesian coordinates (x, y)
+    cartesian_x = []
+    cartesian_y = []
+    net_angular_distance_rad = 0
+    for alt, dist in zip(comparison['AltVsDownrangeDist-alt'], comparison['AltVsDownrangeDist-dist']):
+        radial_distance = utils_data.MARS_RADIUS + alt
+        net_angular_distance_rad += dist / radial_distance
+        
+        # Take a break, then make sure sim_polar code is working in radians and not meters, since radius changes but 360 degrees is always circumference
+        
+        x = dist * math.cos(math.radians(alt))
+        y = dist * math.sin(math.radians(alt))
+        cartesian_x.append(x)
+        cartesian_y.append(y)
+
+    comparison['global_cartesian_pos_x'] = cartesian_x
+    comparison['global_cartesian_pos_y'] = cartesian_y
 
 # Phoenix Entry:
 phoenix = {
@@ -144,6 +171,8 @@ starship = {
     ])
 }
 
+alt_vs_downrange_to_global_cartesian(perseverance)
+
 # Velocity vs. AoA, interpolated
 curiosity_aoa = [
     (6000, 0),
@@ -155,15 +184,15 @@ curiosity_aoa = [
     (0, -15)
 ]
 
-curiosity_data = sim.simulate(
-    time_step=0.01,
-    time_max=1000,
+curiosity_data, curiosity_params = sim_polar.simulate(
     mass=3300,
     area=15.9,
-    aoa=curiosity_aoa,
     entry_altitude=125000,
     entry_flight_path_angle=-14,
     entry_velocity=5700,
+    aoa_function=curiosity_aoa,
+    time_step=0.01,
+    time_max=1000,
     verbose=False,
 )
 
@@ -179,40 +208,39 @@ perseverance_aoa = [
     (0, -15)
 ]
 
-perseverance_data = sim.simulate(
-    time_step=0.01,
-    time_max=1000,
+perseverance_data, perseverance_params = sim_polar.simulate(
     mass=3110,
     area=15.9,
-    aoa=perseverance_aoa,
     entry_altitude=125000,
     entry_flight_path_angle=-12.5, # The real number should be -16 from the velocity component data, but this is a better fit for alt vs. vel, but not alt vs. downrange dist
     entry_velocity=5350,
+    aoa_function=perseverance_aoa,
+    time_step=0.01,
+    time_max=1000,
     verbose=False,
 )
 
-phoenix_data = sim.simulate(
-    time_step=0.01,
-    time_max=1000,
+phoenix_data, phoenix_params = sim_polar.simulate(
     mass=670,
     area=15.9,
-    aoa=0,
     entry_altitude=125000,
     entry_flight_path_angle=-15,
     entry_velocity=5875,
+    aoa_function=0,
+    time_step=0.01,
+    time_max=1000,
     verbose=False,
 )
 
-# Opportunity
-opportunity_data = sim.simulate(
-    time_step=0.01,
-    time_max=1000,
+opportunity_data, opportunity_params = sim_polar.simulate(
     mass=827,
     area=15.9,
-    aoa=0,
     entry_altitude=125000,
     entry_flight_path_angle=-14,
     entry_velocity=5550,
+    aoa_function=0,
+    time_step=0.01,
+    time_max=1000,
     verbose=False,
 )
 
@@ -231,20 +259,20 @@ starship_aoa = [
 ]
 # Fitting to the Starship trajectory is actually not ideal, it starts its burn way too early, ~500m/s. I can do better!
 
-starship_data = sim.simulate(
-    time_step=0.01,
-    time_max=1000,
+starship_data, starship_params = sim_polar.simulate(
     mass=200000,
     area=481,
-    aoa=starship_aoa,
     entry_altitude=125000,
     entry_flight_path_angle=-10,
     entry_velocity=7500,
+    aoa_function=starship_aoa,
+    time_step=0.01,
+    time_max=1000,
     verbose=False,
 )
 
-sim.plot(perseverance_data, "Perseverance Mars Entry Simulation", filename="Historic Lander Charts/Perseverance.png", comparisons=[perseverance], show=False)
-sim.plot(curiosity_data, "Curiosity Mars Entry Simulation", filename="Historic Lander Charts/Curiosity.png", comparisons=[curiosity], show=False)
-sim.plot(phoenix_data, "Phoenix Mars Entry Simulation", filename="Historic Lander Charts/Phoenix.png", comparisons=[phoenix], show=False)
-sim.plot(opportunity_data, "Opportunity Mars Entry Simulation", filename="Historic Lander Charts/Opportunity.png", comparisons=[opportunity], show=False)
-sim.plot(starship_data, "Starship Mars Entry Simulation", filename="Historic Lander Charts/Starship.png", comparisons=[starship], show=False)
+sim_polar.plot(perseverance_data, perseverance_params, title="Perseverance Mars Entry Simulation", file_name="Historic Lander Charts/Perseverance.png", show=False, comparisons=[perseverance])
+sim_polar.plot(curiosity_data, curiosity_params, title="Curiosity Mars Entry Simulation", file_name="Historic Lander Charts/Curiosity.png", show=False, comparisons=[curiosity])
+sim_polar.plot(phoenix_data, phoenix_params, title="Phoenix Mars Entry Simulation", file_name="Historic Lander Charts/Phoenix.png", show=False, comparisons=[phoenix])
+sim_polar.plot(opportunity_data, opportunity_params, title="Opportunity Mars Entry Simulation", file_name="Historic Lander Charts/Opportunity.png", show=False, comparisons=[opportunity])
+sim_polar.plot(starship_data, starship_params, title="Starship Mars Entry Simulation", file_name="Historic Lander Charts/Starship.png", show=False, comparisons=[starship])

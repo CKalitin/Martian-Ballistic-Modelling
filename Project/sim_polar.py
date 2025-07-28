@@ -157,12 +157,12 @@ def plot(data, parameters, title="Mars Entry Simulation", file_name="mars_entry_
     comparisons[-1]['body_points_y'] = comparisons[-1]['body_points_y'][:-3]
 
     # Note we're assuming horizontal velocity = angular velocity, and vertical velocity = radial velocity, which at any given instant relative to the surface should be true
-    
-    utils_chart.sub_plot((3,3,1), "Altitude vs Time", "Time (s)", "Altitude (m)", data.t, [data.alt], ["Simulation"], comparisons, 'AltVsTime-time', 'AltVsTime-alt')
-    utils_chart.sub_plot((3,3,2), "Altitude vs Velocity", "Velocity (m/s)", "Altitude (m)", data.v_net, [data.alt], ["Simulation"], comparisons, 'AltVsVel-vel', 'AltVsVel-alt')
-    utils_chart.sub_plot((3,3,3), "Global Cartesian Position", "X Position (km)", "Y Position (km)", data.global_cartesian_pos_x, [data.global_cartesian_pos_y], ["Global Cartesian Position"], comparisons, ['body_points_x'], ['body_points_y'], equal_aspect=True)
+
+    utils_chart.sub_plot((3,3,1), "Altitude vs Time", "Time (s)", "Altitude (m)", data.t, [data.alt], ["Simulation"], comparisons, ['AltVsTime-time'], ['AltVsTime-alt'])
+    utils_chart.sub_plot((3,3,2), "Altitude vs Velocity", "Velocity (m/s)", "Altitude (m)", data.v_net, [data.alt], ["Simulation"], comparisons, ['AltVsVel-vel'], ['AltVsVel-alt'])
+    utils_chart.sub_plot((3,3,3), "Global Cartesian Position", "X Position (km)", "Y Position (km)", data.global_cartesian_pos_x, [data.global_cartesian_pos_y], ["Global Cartesian Position"], comparisons, ['body_points_x', 'global_cartesian_pos_x'], ['body_points_y', 'global_cartesian_pos_y'], equal_aspect=True)
     #utils_chart.sub_plot((3,3,3), "Altitude vs Downrange Distance (Angular)", "Downrange Distance (m)", "Altitude (m)", data.ang_dist, [data.alt], ["Simulation"], comparisons, 'AltVsDownrangeDist-dist', 'AltVsDownrangeDist-alt')
-    utils_chart.sub_plot((3,3,4), "Velocities vs Time", "Time (s)", "Velocity (m/s)", data.t, [data.v_net, data.v_ang, data.v_rad], ["Net Velocity", "Horizontal Velocity", "Vertical Velocity"], comparisons, 'VelVsTime-time', ['VelVsTime-vel', 'HVelVsTime-vel', 'VVelVsTime-vel'])
+    utils_chart.sub_plot((3,3,4), "Velocities vs Time", "Time (s)", "Velocity (m/s)", data.t, [data.v_net, data.v_ang, data.v_rad], ["Net Velocity", "Horizontal Velocity", "Vertical Velocity"], comparisons, ['VelVsTime-time', 'HVelVsTime-time', 'VVelVsTime-time'], ['VelVsTime-vel', 'HVelVsTime-vel', 'VVelVsTime-vel'])
     utils_chart.sub_plot((3,3,5), "Acceleration vs Time", "Time (s)", "Acceleration (m/s²)", data.t, [data.a_net, data.a_ang, data.a_rad], ["Net Acceleration", "Horizontal Acceleration", "Vertical Acceleration"])
     utils_chart.sub_plot((3,3,6), "Drag, Lift, Gravity Acceleration vs Time", "Time (s)", "Acceleration (m/s²)", data.t, [data.a_drag, data.a_lift, data.a_grav], ["Drag Acceleration", "Lift Acceleration", "Gravity Acceleration"])
     utils_chart.sub_plot((3,3,7), "Flight Path Angle and Angle of Attack vs Time", "Time (s)", "Angle (degrees)", data.t, [data.fpa, data.aoa], ["Flight Path Angle", "Angle of Attack"], comparisons, ['AoAVsTime-time', 'FlightPathAngleVsTime-time'], ['AoAVsTime-aoa', 'FlightPathAngleVsTime-fpa'], 'FlightPathAngleVsTime-label')
@@ -174,18 +174,3 @@ def plot(data, parameters, title="Mars Entry Simulation", file_name="mars_entry_
     plt.savefig(file_name)
     if show: plt.show()
     plt.close()
-
-data, parameters = simulate(
-    mass=1000, 
-    area=10, 
-    entry_altitude=125000, 
-    entry_flight_path_angle=-15, 
-    entry_velocity=6000, 
-    aoa_function=0,
-    time_step=0.1, 
-    time_max=1000, 
-    verbose=False
-)
-
-plot(data, parameters, show=True, file_name="test.png")
-

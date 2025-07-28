@@ -22,10 +22,11 @@ from dataclasses import dataclass
 @dataclass
 class SimData:
     """All simulation data as lists - ready for plotting."""
-    t: list = None; alt: list = None; r_dist: list = None; ang_dist: list = None; a_net: list = None
+    t: list = None; alt: list = None; r_dist: list = None; ang_dist: list = None; ang_dist_rad: list = None; a_net: list = None
     a_rad: list = None; a_ang: list = None; a_grav: list = None; a_drag: list = None; a_lift: list = None
     v_net: list = None; v_rad: list = None; v_ang: list = None; fpa: list = None; aoa: list = None
-    atm_p: list = None; atm_t: list = None; atm_rho: list = None; drag_coeff: list = None; sim_time: list = None
+    atm_p: list = None; atm_t: list = None; atm_rho: list = None; drag_coeff: list = None
+    global_cartesian_pos_x: list = None; global_cartesian_pos_y: list = None; execution_time: list = None
 
     def __post_init__(self):
         for field in self.__dataclass_fields__:
@@ -69,7 +70,8 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
     
     altitude = entry_altitude
     radial_distance = entry_altitude + utils.MARS_RADIUS  # Distance from the center of Mars
-    angular_distance_m = 0
+    net_angular_distance_m = 0
+    net_angular_distance_rad = 0 # radians
     
     vel_net_m = entry_velocity # m/s
     vel_rad_m = entry_velocity * math.sin(math.radians(entry_flight_path_angle)) # Radial velocity (m/s)
@@ -95,6 +97,8 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
         a_drag = get_drag_acc(mass, vel_net_m, area, atm_density)
         a_lift = get_lift_acc(a_drag, aoa)
 
+        print(f"alt: {altitude}, a_drag: {a_drag}, a_lift: {a_lift}, a_grav: {a_grav}, atm_pressure: {atm_pressure}, atm_density: {atm_density}")
+
         # Update velocities
         a_rad = a_grav + math.sin(math.radians(flight_path_angle)) * a_drag + math.sin(math.radians(flight_path_angle)) * a_lift
         a_ang = math.cos(math.radians(flight_path_angle)) * a_drag + math.cos(math.radians(flight_path_angle)) * a_lift
@@ -109,12 +113,25 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
 
         # Update Positions
         radial_distance += vel_rad_m * time_step
-        angular_distance_m += vel_ang_m * time_step
         altitude = radial_distance - utils.MARS_RADIUS
         
-        data.add(t, altitude, radial_distance, angular_distance_m, a_net, a_rad, a_ang, a_grav, a_drag, a_lift, vel_net_m, vel_rad_m, vel_ang_m, flight_path_angle, aoa, atm_pressure, atm_temperature, atm_density, drag_coeff, time.time() - simulation_start_time)
+        angular_distance_m = vel_ang_m * time_step
+        angular_distance_rad = angular_distance_m / radial_distance # theta = s/r
+        
+        net_angular_distance_m = net_angular_distance_m + angular_distance_m
+        net_angular_distance_rad = net_angular_distance_rad + angular_distance_rad
+        
+        global_cartesian_pos_x = radial_distance * math.sin(net_angular_distance_rad) / 1000 # Convert to km
+        global_cartesian_pos_y = radial_distance * math.cos(net_angular_distance_rad) / 1000
+        
+        data.add(t, altitude, radial_distance, net_angular_distance_m, net_angular_distance_rad, a_net, a_rad, a_ang, a_grav, a_drag, a_lift, vel_net_m, vel_rad_m, vel_ang_m, flight_path_angle, aoa, atm_pressure, atm_temperature, atm_density, drag_coeff, global_cartesian_pos_x, global_cartesian_pos_y, time.time() - simulation_start_time)
         if verbose: print(f"{data[-1]}\n")
-
+        
+        # Rotate velocity vector counterclockwise so velocity is consistent in a global cartesian coordinate system
+        temp_vel_rad_m = vel_rad_m * math.cos(angular_distance_rad) + vel_ang_m * math.sin(angular_distance_rad)
+        temp_vel_ang_m = -vel_rad_m * math.sin(angular_distance_rad) + vel_ang_m * math.cos(angular_distance_rad)
+        vel_rad_m, vel_ang_m = temp_vel_rad_m, temp_vel_ang_m
+        
         t += time_step
 
     parameters = {'mass': mass, 'area': area, 'ballistic_coefficient': mass/area, 'entry_altitude': entry_altitude, 'entry_flight_path_angle': entry_flight_path_angle, 'entry_velocity': entry_velocity, 'time_step': time_step, 'time_max': time_max}
@@ -154,7 +171,8 @@ def plot(data, parameters, title="Mars Entry Simulation", file_name="mars_entry_
     
     sub_plot((3,3,1), "Altitude vs Time", "Time (s)", "Altitude (m)", data.t, [data.alt], ["Simulation"], comparisons, 'AltVsTime-time', 'AltVsTime-alt')
     sub_plot((3,3,2), "Altitude vs Velocity", "Velocity (m/s)", "Altitude (m)", data.v_net, [data.alt], ["Simulation"], comparisons, 'AltVsVel-vel', 'AltVsVel-alt')
-    sub_plot((3,3,3), "Altitude vs Downrange Distance (Angular)", "Downrange Distance (m)", "Altitude (m)", data.ang_dist, [data.alt], ["Simulation"], comparisons, 'AltVsDownrangeDist-dist', 'AltVsDownrangeDist-alt')
+    sub_plot((3,3,3), "Global Cartesian Position", "X Position (km)", "Y Position (km)", data.global_cartesian_pos_x, [data.global_cartesian_pos_y], ["Global Cartesian Position"], comparisons, ['body_points_x'], ['body_points_y'], equal_aspect=True)
+    #sub_plot((3,3,3), "Altitude vs Downrange Distance (Angular)", "Downrange Distance (m)", "Altitude (m)", data.ang_dist, [data.alt], ["Simulation"], comparisons, 'AltVsDownrangeDist-dist', 'AltVsDownrangeDist-alt')
     sub_plot((3,3,4), "Velocities vs Time", "Time (s)", "Velocity (m/s)", data.t, [data.v_net, data.v_ang, data.v_rad], ["Net Velocity", "Horizontal Velocity", "Vertical Velocity"], comparisons, 'VelVsTime-time', ['VelVsTime-vel', 'HVelVsTime-vel', 'VVelVsTime-vel'])
     sub_plot((3,3,5), "Acceleration vs Time", "Time (s)", "Acceleration (m/s²)", data.t, [data.a_net, data.a_ang, data.a_rad], ["Net Acceleration", "Horizontal Acceleration", "Vertical Acceleration"])
     sub_plot((3,3,6), "Drag, Lift, Gravity Acceleration vs Time", "Time (s)", "Acceleration (m/s²)", data.t, [data.a_drag, data.a_lift, data.a_grav], ["Drag Acceleration", "Lift Acceleration", "Gravity Acceleration"])
@@ -168,7 +186,7 @@ def plot(data, parameters, title="Mars Entry Simulation", file_name="mars_entry_
     if show: plt.show()
     plt.close()
 
-def sub_plot(position, title, x_label, y_label, x_data, y_data_list, series_labels, comparisons=[], comparison_x_key=None, comparison_y_keys=None, comparison_label_field='label'):
+def sub_plot(position, title, x_label, y_label, x_data, y_data_list, series_labels, comparisons=[], comparison_x_key=None, comparison_y_keys=None, comparison_label_field='label', equal_aspect = False):
     """
     Creates a subplot and plots multiple data series, with optional comparison series.
         position (tuple): A tuple (nrows, ncols, index) specifying the subplot position.
@@ -181,7 +199,8 @@ def sub_plot(position, title, x_label, y_label, x_data, y_data_list, series_labe
         comparisons (list of dict, optional): List of comparison data dictionaries. Each dictionary should contain keys for x and y data and label.
         comparison_x_key (list of str, optional): List of keys to extract x-axis data from each comparison dictionary.
         comparison_y_keys (list of str, optional): List of keys to extract y-axis data from each comparison dictionary.
-        comparison_y_label_keys (list of str, optional): List of keys to extract label for each comparison series.
+        comparison_label_field (str, optional): The key in the comparison dictionaries to use for the label. Defaults to 'label'.
+        equal_aspect (bool, optional): Whether to set equal aspect ratio for the subplot. Defaults to False.
     Returns:
         None: The function creates a subplot and plots the provided data.
     Notes:
@@ -204,6 +223,18 @@ def sub_plot(position, title, x_label, y_label, x_data, y_data_list, series_labe
                 label_field = comparison_label_field if comparison_label_field in comparison else 'label' # I FUCKING LOVE PYTHON
                 plt.plot(comparison[x_key], comparison[y_key], '--', label=comparison[label_field], zorder=zorder)
                 zorder -= 1
+                
+    if equal_aspect:
+        x_range = max(x_data) - min(x_data) # x range of the data
+        y_range = max(y_data_list[0]) - min(y_data_list[0])
+        fig_aspect = plt.gcf().get_size_inches()[0] / position[0] / (plt.gcf().get_size_inches()[1] / position[1]) # On screen x to y pixel ratio
+        if x_range / y_range > fig_aspect: # If the x range is larger than the y range, adjust y limits
+            y_center = sum(y_data_list[0]) / len(y_data_list[0])
+            plt.ylim(y_center - x_range / fig_aspect / 2, y_center + x_range / fig_aspect / 2)
+        else: # If the y range is larger than the x range, adjust x limits
+            x_center = sum(x_data) / len(x_data)
+            plt.xlim(x_center - y_range * fig_aspect / 2, x_center + y_range * fig_aspect / 2)
+        plt.gca().set_aspect('equal', adjustable='datalim')
 
     plt.title(title)
     plt.xlabel(x_label)
@@ -272,33 +303,69 @@ def sub_plot_text(position, parameters, data):
 
     plt.text(0.4, 0.91, f"Final Altitude: {data.alt[-1]:.2f} m", fontsize=10)
     plt.text(0.4, 0.84, f"Final Downrange Distance: {data.ang_dist[-1]:.2f} m", fontsize=10)
+    plt.text(0.4, 0.77, f"Final Angular Distance (Deg): {math.degrees(data.ang_dist_rad[-1]):.2f} degrees", fontsize=10)
 
-    # refactor all below to use -1 index instead of final
-    plt.text(0.4, 0.77, f"Final Velocity: {data.v_net[-1]:.2f} m/s", fontsize=10)
-    plt.text(0.4, 0.70, f"Final Horizontal Velocity: {data.v_ang[-1]:.2f} m/s", fontsize=10)
-    plt.text(0.4, 0.63, f"Final Vertical Velocity: {data.v_rad[-1]:.2f} m/s", fontsize=10)
+    plt.text(0.4, 0.67, f"Final Velocity: {data.v_net[-1]:.2f} m/s", fontsize=10)
+    plt.text(0.4, 0.60, f"Final Horizontal Velocity: {data.v_ang[-1]:.2f} m/s", fontsize=10)
+    plt.text(0.4, 0.53, f"Final Vertical Velocity: {data.v_rad[-1]:.2f} m/s", fontsize=10)
     
-    plt.text(0.4, 0.53, f"Final Acceleration: {data.a_net[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.46, f"Final Horizontal Acceleration: {data.a_ang[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.39, f"Final Vertical Acceleration: {data.a_rad[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.32, f"Final Drag Acceleration: {data.a_drag[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.25, f"Final Gravity Acceleration: {data.a_grav[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.43, f"Final Acceleration: {data.a_net[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.36, f"Final Horizontal Acceleration: {data.a_ang[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.29, f"Final Vertical Acceleration: {data.a_rad[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.22, f"Final Drag Acceleration: {data.a_drag[-1]:.2f} m/s²", fontsize=10)
+    plt.text(0.4, 0.15, f"Final Gravity Acceleration: {data.a_grav[-1]:.2f} m/s²", fontsize=10)
 
-    plt.text(0.4, 0.15, f"Final Flight Path Angle: {data.fpa[-1]:.2f} degrees", fontsize=10)
-    plt.text(0.4, 0.08, f"Final Time: {data.t[-1]:.2f} seconds", fontsize=10)
+    plt.text(0.4, 0.05, f"Final Flight Path Angle: {data.fpa[-1]:.2f} degrees", fontsize=10)
+    plt.text(0.4, -0.02, f"Final Time: {data.t[-1]:.2f} seconds", fontsize=10)
 
-    plt.text(0.4, -0.02, f"Execution Time: {data.sim_time[-1]:.2f} seconds", fontsize=10)  
+    plt.text(0.4, -0.12, f"Execution Time: {data.execution_time[-1]:.2f} seconds", fontsize=10)  
+
+comparison = { 'body_points_x': utils.mars_circumference_points_km_x, 'body_points_y': utils.mars_circumference_points_km_y, 'label': 'Mars' }
 
 data, parameters = simulate(
     mass=1000, 
     area=10, 
-    entry_altitude=100000, 
-    entry_flight_path_angle=-15, 
-    entry_velocity=6000, 
+    entry_altitude=1000000, 
+    entry_flight_path_angle=0, 
+    entry_velocity=3500, 
     aoa_function=0,
-    time_step=0.1, 
-    time_max=1000, 
+    time_step=10, 
+    time_max=100000, 
     verbose=False
 )
 
-plot(data, parameters, show=True, file_name="test.png")
+def remove_comparison_body_points_out_of_range(comparison, data):
+    """
+    Removes points from comparison['body_points_x'] and comparison['body_points_y'] that are out of the specified range.
+    The lists are modified in place.
+    
+    Find the farthest points (in +/- x & y), if any body points are out of range, remove them
+    If a point in the x list is out of range, remove the corresponding point in the y list
+    """
+    
+    margin = 50 # km
+    
+    x_min = min(data.global_cartesian_pos_x) - margin
+    x_max = max(data.global_cartesian_pos_x) + margin
+    y_min = min(data.global_cartesian_pos_y) - margin
+    y_max = max(data.global_cartesian_pos_y) + margin
+    
+    x_points = comparison['body_points_x']
+    y_points = comparison['body_points_y']
+    filtered_x = []
+    filtered_y = []
+    for x, y in zip(x_points, y_points):
+        if x_min <= x <= x_max and y_min <= y <= y_max:
+            filtered_x.append(x)
+            filtered_y.append(y)
+    comparison['body_points_x'] = filtered_x
+    comparison['body_points_y'] = filtered_y
+
+remove_comparison_body_points_out_of_range(comparison, data)
+
+# remove last 3 from x and y, yea im just hardcoding this in, it makes it loop back and puts an ugly line across the graph
+comparison['body_points_x'] = comparison['body_points_x'][:-3]
+comparison['body_points_y'] = comparison['body_points_y'][:-3]
+
+plot(data, parameters, show=True, file_name="test.png", comparisons=[comparison])
+

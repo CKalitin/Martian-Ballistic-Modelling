@@ -1,4 +1,4 @@
-import utils
+import Project.utils_sim as utils_sim
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +11,7 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
 
     if type(aoa) != list:
         aoa = [[entry_altitude, aoa], [0, aoa]]
-    aoa_list = utils.get_numpy_aoa_list(aoa)
+    aoa_list = utils_sim.get_numpy_aoa_list(aoa)
 
     ballistic_coefficient = mass / area
 
@@ -58,19 +58,19 @@ def simulate(time_step=None, time_max=None, mass=None, area=None, aoa=None, entr
 
     t = 0
     while t < time_max and altitude > 0:
-        atm_pressure = utils.get_atmospheric_pressure(altitude)
-        atm_temperature = utils.get_temperature(altitude)
-        atm_density = utils.get_atmospheric_density(altitude, atm_pressure, atm_temperature)
-        drag_coeff = utils.get_interpolated_drag_coefficient(velocity)
-        drag_acc = utils.get_drag_acc(mass, velocity, area, drag_coeff, atm_density)
+        atm_pressure = utils_sim.get_atmospheric_pressure(altitude)
+        atm_temperature = utils_sim.get_temperature(altitude)
+        atm_density = utils_sim.get_atmospheric_density(altitude, atm_pressure, atm_temperature)
+        drag_coeff = utils_sim.get_interpolated_drag_coefficient(velocity)
+        drag_acc = utils_sim.get_drag_acc(mass, velocity, area, drag_coeff, atm_density)
         
-        aoa = utils.get_interpolated_aoa(aoa_list, velocity)
+        aoa = utils_sim.get_interpolated_aoa(aoa_list, velocity)
         angles_of_attack.append(aoa)
         
-        lift_to_drag_ratio = utils.get_interpolated_lift_to_drag_ratio(aoa)
-        lift_acc = utils.get_lift_acc(drag_acc, lift_to_drag_ratio)
+        lift_to_drag_ratio = utils_sim.get_interpolated_lift_to_drag_ratio(aoa)
+        lift_acc = utils_sim.get_lift_acc(drag_acc, lift_to_drag_ratio)
         
-        grav_acc = utils.get_gravity_acc(altitude)
+        grav_acc = utils_sim.get_gravity_acc(altitude)
         
         a_x = drag_acc * math.cos(math.radians(flight_path_angle)) + lift_acc * math.cos(math.radians(flight_path_angle+90))
         a_y = drag_acc * math.sin(math.radians(flight_path_angle)) + lift_acc * math.sin(math.radians(flight_path_angle+90)) + grav_acc
@@ -367,7 +367,7 @@ data = simulate(
     mass=1000,
     area=10,
     aoa=0,
-    entry_altitude=100000,
+    entry_altitude=125000,
     entry_flight_path_angle=-15,
     entry_velocity=6000,
     verbose=False

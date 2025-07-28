@@ -94,10 +94,8 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
 
         # Calculate acceleration
         a_grav = get_gravity_acc(radial_distance)
-        a_drag = get_drag_acc(mass, vel_net_m, area, atm_density)
-        a_lift = get_lift_acc(a_drag, aoa)
-
-        print(f"alt: {altitude}, a_drag: {a_drag}, a_lift: {a_lift}, a_grav: {a_grav}, atm_pressure: {atm_pressure}, atm_density: {atm_density}")
+        a_drag = 0#get_drag_acc(mass, vel_net_m, area, atm_density)
+        a_lift = 0#get_lift_acc(a_drag, aoa)
 
         # Update velocities
         a_rad = a_grav + math.sin(math.radians(flight_path_angle)) * a_drag + math.sin(math.radians(flight_path_angle)) * a_lift

@@ -210,7 +210,7 @@ def plot(data, title="Mars Entry Simulation", filename='mars_entry_simulation.pn
     
     # Plot 1,3: Altitude vs Downrange Distance
     plt.subplot(3, 3, 3)
-    plt.plot(downrange_dists, net_surface_y_dists, label='Altitude vs Downrange', zorder=999)
+    plt.plot(downrange_dists, altitudes, label='Altitude vs Downrange', zorder=999)
     for comparison in comparisons:
         if 'AltVsDownrangeDist-dist' in comparison:
             plt.plot(comparison['AltVsDownrangeDist-dist'], comparison['AltVsDownrangeDist-alt'], '--', label=comparison['label'])

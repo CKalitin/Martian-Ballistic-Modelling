@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import math
 
+import utils_data
+
 def sub_plot(position, title, x_label, y_label, x_data, y_data_list, series_labels, comparisons=[], comparison_x_key=None, comparison_y_keys=None, comparison_label_field='label', equal_aspect = False):
     """
     Creates a subplot and plots multiple data series, with optional comparison series.
@@ -118,7 +120,7 @@ def sub_plot_text(position, parameters, data):
     plt.text(0.4, 1, f"Terminal Values (At Impact):", fontsize=10, fontweight='bold')
 
     plt.text(0.4, 0.91, f"Final Altitude: {data.alt[-1]:.2f} m", fontsize=10)
-    plt.text(0.4, 0.84, f"Final Downrange Distance: {data.ang_dist[-1]:.2f} m", fontsize=10)
+    plt.text(0.4, 0.84, f"Final Downrange Distance: {(data.ang_dist_rad[-1] * utils_data.MARS_RADIUS):.2f} m", fontsize=10)
     plt.text(0.4, 0.77, f"Final Angular Distance (Deg): {math.degrees(data.ang_dist_rad[-1]):.2f} degrees", fontsize=10)
 
     plt.text(0.4, 0.67, f"Final Velocity: {data.v_net[-1]:.2f} m/s", fontsize=10)

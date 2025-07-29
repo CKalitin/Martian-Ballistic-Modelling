@@ -24,7 +24,7 @@ import utils_data
 @dataclass
 class SimData:
     """All simulation data as lists - ready for plotting."""
-    t: list = None; alt: list = None; r_dist: list = None; ang_dist: list = None; ang_dist_rad: list = None; a_net: list = None
+    t: list = None; alt: list = None; r_dist: list = None; ang_dist_rad: list = None; a_net: list = None
     a_rad: list = None; a_ang: list = None; a_grav: list = None; a_drag: list = None; a_lift: list = None
     v_net: list = None; v_rad: list = None; v_ang: list = None; fpa: list = None; aoa: list = None
     atm_p: list = None; atm_t: list = None; atm_rho: list = None; drag_coeff: list = None
@@ -117,14 +117,12 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
         
         angular_distance_m = vel_ang_m * time_step
         angular_distance_rad = angular_distance_m / radial_distance # theta = s/r
-        
-        net_angular_distance_m = net_angular_distance_m + angular_distance_m
         net_angular_distance_rad = net_angular_distance_rad + angular_distance_rad
         
         global_cartesian_pos_x = radial_distance * math.sin(net_angular_distance_rad) / 1000 # Convert to km
         global_cartesian_pos_y = radial_distance * math.cos(net_angular_distance_rad) / 1000
         
-        data.add(t, altitude, radial_distance, net_angular_distance_m, net_angular_distance_rad, a_net, a_rad, a_ang, a_grav, a_drag, a_lift, vel_net_m, vel_rad_m, vel_ang_m, flight_path_angle, aoa, atm_pressure, atm_temperature, atm_density, drag_coeff, global_cartesian_pos_x, global_cartesian_pos_y, time.time() - simulation_start_time)
+        data.add(t, altitude, radial_distance, net_angular_distance_rad, a_net, a_rad, a_ang, a_grav, a_drag, a_lift, vel_net_m, vel_rad_m, vel_ang_m, flight_path_angle, aoa, atm_pressure, atm_temperature, atm_density, drag_coeff, global_cartesian_pos_x, global_cartesian_pos_y, time.time() - simulation_start_time)
         if verbose: print(f"{data[-1]}\n")
         
         # Rotate velocity vector counterclockwise so velocity is consistent in a global cartesian coordinate system

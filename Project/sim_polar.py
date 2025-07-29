@@ -99,8 +99,8 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
         a_lift = utils_sim.get_lift_acc(a_drag, aoa)
 
         # Update velocities
-        a_rad = a_grav + math.sin(math.radians(flight_path_angle)) * a_drag + math.sin(math.radians(flight_path_angle)) * a_lift
-        a_ang = math.cos(math.radians(flight_path_angle)) * a_drag + math.cos(math.radians(flight_path_angle)) * a_lift
+        a_rad = a_grav + math.sin(math.radians(flight_path_angle)) * a_drag + math.sin(math.radians(flight_path_angle + 90)) * a_lift
+        a_ang = math.cos(math.radians(flight_path_angle)) * a_drag + math.cos(math.radians(flight_path_angle + 90)) * a_lift
         a_net = math.sqrt(a_rad**2 + a_ang**2)
         
         vel_rad_m += a_rad * time_step

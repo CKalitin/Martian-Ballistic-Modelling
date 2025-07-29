@@ -60,4 +60,4 @@ def get_drag_acc(mass, vel_net, area, atm_density):
 def get_lift_acc(drag_acc, aoa):
     # drag_acc = m/s^2, flight_path_angle = degrees
     ld = get_interpolated_lift_to_drag_ratio(aoa)
-    return drag_acc * ld if ld != 0 else 0
+    return -drag_acc * ld if ld != 0 else 0

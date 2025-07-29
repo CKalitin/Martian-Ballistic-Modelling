@@ -175,11 +175,11 @@ alt_vs_downrange_to_global_cartesian(perseverance)
 # Velocity vs. AoA, interpolated
 curiosity_aoa = [
     (6000, 0),
-    (5600, 12),
-    (4800, 12),
-    (3000, 12),
-    (1200, 17),
-    (500, 10),
+    (5600, 0),
+    (4800, 20),
+    (3000, 25),
+    (1200, 25),
+    (500, 20),
     (0, -15)
 ]
 
@@ -187,7 +187,7 @@ curiosity_data, curiosity_params = sim_polar.simulate(
     mass=3300,
     area=15.9,
     entry_altitude=125000,
-    entry_flight_path_angle=-14, # Reality: -14
+    entry_flight_path_angle=-16, # Reality: -14
     entry_velocity=5700,
     aoa_function=curiosity_aoa,
     time_step=0.01,

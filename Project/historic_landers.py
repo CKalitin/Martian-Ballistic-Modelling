@@ -176,10 +176,10 @@ alt_vs_downrange_to_global_cartesian(perseverance)
 curiosity_aoa = [
     (6000, 0),
     (5600, 0),
-    (4800, 20),
-    (3000, 25),
-    (1200, 25),
-    (500, 20),
+    (4800, 12),
+    (3000, 12),
+    (1200, 17),
+    (500, 10),
     (0, -15)
 ]
 
@@ -187,7 +187,7 @@ curiosity_data, curiosity_params = sim_polar.simulate(
     mass=3300,
     area=15.9,
     entry_altitude=125000,
-    entry_flight_path_angle=-16, # Reality: -14
+    entry_flight_path_angle=-18, # Reality: -14
     entry_velocity=5700,
     aoa_function=curiosity_aoa,
     time_step=0.01,
@@ -197,13 +197,14 @@ curiosity_data, curiosity_params = sim_polar.simulate(
 
 # Velocity vs. AoA, interpolated
 perseverance_aoa = [
-    (6000, 15),
+    (6000, 20),
     (5200, 20),
-    (3000, 15),
-    (2000, 15),
-    (1000, 15),
-    (500, 17),
-    (300, -15),
+    (4200, 7),
+    (3600, 7),
+    (2000, 8),
+    (1800, 17),
+    (350, 20),
+    (200, -15),
     (0, -15)
 ]
 
@@ -211,7 +212,7 @@ perseverance_data, perseverance_params = sim_polar.simulate(
     mass=3110,
     area=15.9,
     entry_altitude=125000,
-    entry_flight_path_angle=-15, # In cartesian simulation I used -12.5 for the best fit, Reality: -16? Derive from the Global cartesian position chart by eye!!!
+    entry_flight_path_angle=-15.5, # In cartesian simulation I used -12.5 for the best fit, Reality: -16? Derive from the Global cartesian position chart by eye!!!
     entry_velocity=5350,
     aoa_function=perseverance_aoa,
     time_step=0.01,

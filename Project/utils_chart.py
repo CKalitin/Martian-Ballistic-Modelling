@@ -103,40 +103,47 @@ def sub_plot_text(position, parameters, data):
     plt.subplot(position[0], position[1], position[2])
     plt.axis('off')
 
-    plt.text(-0.15, 1.0, f"Parameters:", fontsize=10, fontweight='bold')
+    parameters_text = [
+        (0, f"Parameters:", 'bold'),
+        (0, f"Mass: {parameters['mass']} kg", None),
+        (0, f"Area: {parameters['area']} m²", None),
+        (0, f"Ballistic Coefficient: {round(parameters['ballistic_coefficient'])} kg/m²", None),
+        (1, f"Entry Altitude: {parameters['entry_altitude']} m", None),
+        (1, f"Entry Flight Path Angle: {parameters['entry_flight_path_angle']}°", None),
+        (1, f"Entry Velocity: {parameters['entry_velocity']} m/s", None),
+        (2, f"Time Step: {parameters['time_step']} s", None),
+        (2, f"Max Time: {parameters['time_max']} s", None),
+    ]
     
-    plt.text(-0.15, 0.91, f"Mass: {parameters['mass']} kg", fontsize=10)
-    plt.text(-0.15, 0.84, f"Area: {parameters['area']} m²", fontsize=10)
-    plt.text(-0.15, 0.77, f"Ballistic Coefficient: {parameters['ballistic_coefficient']:.2f} kg/m²", fontsize=10)
+    if 'aoa' in parameters:
+        parameters_text.append((3, f"Constant AoA: {parameters['aoa']}°", None))
 
-    plt.text(-0.15, 0.67, f"Entry Altitude: {parameters['entry_altitude']} m", fontsize=10)
-    plt.text(-0.15, 0.60, f"Entry Flight Path Angle: {parameters['entry_flight_path_angle']} degrees", fontsize=10)
-    plt.text(-0.15, 0.53, f"Entry Velocity: {parameters['entry_velocity']} m/s", fontsize=10)
-
-    plt.text(-0.15, 0.43, f"Time Step: {parameters['time_step']} second(s)", fontsize=10)
-    plt.text(-0.15, 0.36, f"Max Time: {parameters['time_max']} seconds", fontsize=10)
-
-    # Final values
-    plt.text(0.4, 1, f"Terminal Values (At Impact):", fontsize=10, fontweight='bold')
-
-    plt.text(0.4, 0.91, f"Final Altitude: {data.alt[-1]:.2f} m", fontsize=10)
-    plt.text(0.4, 0.84, f"Final Downrange Distance: {(data.ang_dist_rad[-1] * utils_data.MARS_RADIUS):.2f} m", fontsize=10)
-    plt.text(0.4, 0.77, f"Final Angular Distance (Deg): {math.degrees(data.ang_dist_rad[-1]):.2f} degrees", fontsize=10)
-
-    plt.text(0.4, 0.67, f"Final Velocity: {data.v_net[-1]:.2f} m/s", fontsize=10)
-    plt.text(0.4, 0.60, f"Final Horizontal Velocity: {data.v_ang[-1]:.2f} m/s", fontsize=10)
-    plt.text(0.4, 0.53, f"Final Vertical Velocity: {data.v_rad[-1]:.2f} m/s", fontsize=10)
+    text_box(-0.10, 1.0, parameters_text)
     
-    plt.text(0.4, 0.43, f"Final Acceleration: {data.a_net[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.36, f"Final Horizontal Acceleration: {data.a_ang[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.29, f"Final Vertical Acceleration: {data.a_rad[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.22, f"Final Drag Acceleration: {data.a_drag[-1]:.2f} m/s²", fontsize=10)
-    plt.text(0.4, 0.15, f"Final Gravity Acceleration: {data.a_grav[-1]:.2f} m/s²", fontsize=10)
+    impact_values_text = [
+        (0, f"Impact Values:", 'bold'),
+        (0, f"Final Altitude: {data.alt[-1]:.2f} m", None),
+        (0, f"Final Downrange Distance: {(data.ang_dist_rad[-1] * utils_data.MARS_RADIUS):.2f} m", None),
+        (0, f"Final Angular Displacement: {math.degrees(data.ang_dist_rad[-1]):.2f}°", None),
+        (1, f"Final Velocity: {data.v_net[-1]:.2f} m/s", None),
+        (1, f"Final Horizontal Velocity: {data.v_ang[-1]:.2f} m/s", None),
+        (1, f"Final Vertical Velocity: {data.v_rad[-1]:.2f} m/s", None),
+        (2, f"Final Acceleration: {data.a_net[-1]:.2f} m/s²", None),
+        (2, f"Final Horizontal Acceleration: {data.a_ang[-1]:.2f} m/s²", None),
+        (2, f"Final Vertical Acceleration: {data.a_rad[-1]:.2f} m/s²", None),
+        (2, f"Final Drag Acceleration: {data.a_drag[-1]:.2f} m/s²", None),
+        (2, f"Final Gravity Acceleration: {data.a_grav[-1]:.2f} m/s²", None),
+        (3, f"Final Flight Path Angle: {data.fpa[-1]:.2f}°", None),
+        (3, f"Final Time: {data.t[-1]:.2f} s", None),
+        (4, f"Execution Time: {data.execution_time[-1]:.2f} s", None)
+    ]
+    
+    text_box(0.4, 1.0, impact_values_text)
 
-    plt.text(0.4, 0.05, f"Final Flight Path Angle: {data.fpa[-1]:.2f} degrees", fontsize=10)
-    plt.text(0.4, -0.02, f"Final Time: {data.t[-1]:.2f} seconds", fontsize=10)
-
-    plt.text(0.4, -0.12, f"Execution Time: {data.execution_time[-1]:.2f} seconds", fontsize=10)  
+def text_box(x, y, text_lines):
+    # text_lines: array of tuples (group index, text, fontweight)
+    for i, (group_index, text, fontweight) in enumerate(text_lines): # Enumerate adds a loop iteration number, Python! Man!
+        plt.text(x, y - (i * 0.07) - (group_index * 0.03), text, fontsize=10, fontweight=fontweight) # 0.03 so it adds to 0.1
 
 def remove_comparison_body_points_out_of_range(comparison, data):
     """

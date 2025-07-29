@@ -134,6 +134,9 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
 
     parameters = {'mass': mass, 'area': area, 'ballistic_coefficient': mass/area, 'entry_altitude': entry_altitude, 'entry_flight_path_angle': entry_flight_path_angle, 'entry_velocity': entry_velocity, 'time_step': time_step, 'time_max': time_max}
     
+    if len(aoa_function) == 2:
+        parameters['aoa'] = aoa_function[0][1]
+
     return data, parameters
 
 def plot(data, parameters, title="Mars Entry Simulation", file_name="mars_entry_simulation.png", show=False, comparisons=None):
@@ -166,3 +169,17 @@ def plot(data, parameters, title="Mars Entry Simulation", file_name="mars_entry_
     plt.savefig(file_name)
     if show: plt.show()
     plt.close()
+
+# example usage
+if __name__ == "__main__":
+    # Example parameters
+    mass = 100000  # kg
+    area = 1  # m²
+    entry_altitude = 100000  # m
+    entry_flight_path_angle = -5 # degrees
+    entry_velocity = 3800  # m/s
+    aoa_function = 0
+
+    data, params = simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity, aoa_function=aoa_function, time_step=0.1, time_max=10000, verbose=False)
+    
+    plot(data, params, title="Mars Entry Simulation Example", file_name="test.png", show=True)

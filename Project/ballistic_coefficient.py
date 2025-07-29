@@ -1,4 +1,4 @@
-import sim
+import sim_polar
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -6,7 +6,7 @@ file_path = 'Ballistic-Coefficient-Charts/'
 
 # simulation parameters
 time_step = 0.1
-time_max = 100000
+time_max = 1000000 # Needs to be long for skip reentries into orbits
 entry_altitude = 125000
 entry_flight_path_angle = -15
 entry_velocity = 6000
@@ -22,7 +22,7 @@ annotation_aoas = [0,20,30]
 annotation_labels = ['Opportunity','Perseverance','Starship']
 
 # sweep AoA from -25 to +25 in 5° increments
-aoa_list = list(range(0, 40, 10))
+aoa_list = list(range(0, 90, 10))
 
 # store terminal velocities for each AoA
 results = {}
@@ -31,21 +31,21 @@ for aoa in aoa_list:
     print(f"\n=== Running AoA = {aoa} ===")
     tvs = []
     for mass in masses:
-        sim_data = sim.simulate(
-            time_step=time_step,
-            time_max=time_max,
+        data, params = sim_polar.simulate(
             mass=mass,
             area=area,
-            aoa=aoa,
             entry_altitude=entry_altitude,
             entry_flight_path_angle=entry_flight_path_angle,
             entry_velocity=entry_velocity,
+            aoa_function=aoa,
+            time_step=time_step,
+            time_max=time_max,
             verbose=False,
         )
-        term_v = sim_data['velocities'][-1]
+        term_v = data.v_net[-1]
         tvs.append(term_v)
         print(f"  Mass={mass:.3f} kg -> V_terminal={term_v:.2f} m/s")
-        sim.plot(sim_data, filename=f"{file_path}raw/BC_{(mass / area):.3f}_AoA_{aoa:+d}".replace('.', '-'), show=False)
+        sim_polar.plot(data, params, file_name=f"{file_path}raw/BC_{(mass / area):.3f}_AoA_{aoa:+d}".replace('.', '-'), show=False)
     results[aoa] = np.array(tvs)
 
 # print CSV-style summary

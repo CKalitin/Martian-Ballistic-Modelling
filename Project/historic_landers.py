@@ -176,9 +176,9 @@ alt_vs_downrange_to_global_cartesian(perseverance)
 curiosity_aoa = [
     (6000, 0),
     (5600, 0),
-    (4800, 12),
-    (3000, 12),
-    (1200, 17),
+    (4500, 3),
+    (3500, 18),
+    (1200, 18),
     (500, 10),
     (0, -15)
 ]
@@ -187,7 +187,7 @@ curiosity_data, curiosity_params = sim_polar.simulate(
     mass=3300,
     area=15.9,
     entry_altitude=125000,
-    entry_flight_path_angle=-18, # Reality: -14
+    entry_flight_path_angle=-20, # Reality: -14
     entry_velocity=5700,
     aoa_function=curiosity_aoa,
     time_step=0.01,
@@ -246,15 +246,16 @@ opportunity_data, opportunity_params = sim_polar.simulate(
 
 # Starship
 starship_aoa = [
-    (7600, 65),
-    (6600, 65),
+    (7600, -50),
+    (7200, 0),
+    (6800, 70),
+    (6400, 30),
     (6000, 0),
-    (5500, 0),
-    (4500, -30),
-    (2300, 0),
-    (1600, 50),
-    (800, 20),
-    (500, 0),
+    (4500, -50),
+    (2700, 0),
+    (1800, 50),
+    (1000, 30),
+    (900, 0),
     (300, 0)
 ]
 # Fitting to the Starship trajectory is actually not ideal, it starts its burn way too early, ~500m/s. I can do better!
@@ -263,7 +264,7 @@ starship_data, starship_params = sim_polar.simulate(
     mass=200000,
     area=481,
     entry_altitude=125000,
-    entry_flight_path_angle=-10,
+    entry_flight_path_angle=-13,
     entry_velocity=7500,
     aoa_function=starship_aoa,
     time_step=0.01,

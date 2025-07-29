@@ -20,6 +20,7 @@ import utils_data
 
 # TODO:
 # - Bank angle (angle between normal of the vehicle and normal of the surface)
+# - Parachute (not too hard, just use parachute area and drag coefficient)
 
 @dataclass
 class SimData:

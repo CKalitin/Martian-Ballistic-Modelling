@@ -146,14 +146,8 @@ def plot(data, parameters, title="Mars Entry Simulation", file_name="mars_entry_
     plt.gcf().text(0.01, 0.965, f"Christopher Kalitin 2025", fontsize=12)
     plt.axis('off')
     
-    # Add Mars body for global cartesian position chart
-    comparisons.append({'body_points_x': utils_data.mars_circumference_points_km_x, 'body_points_y': utils_data.mars_circumference_points_km_y, 'label': 'Mars'})
-    utils_chart.remove_comparison_body_points_out_of_range(comparisons[-1], data)
-
-    # remove last 3 from x and y, yea im just hardcoding this in, it makes it loop back and puts an ugly line across the graph
-    comparisons[-1]['body_points_x'] = comparisons[-1]['body_points_x'][:-3]
-    comparisons[-1]['body_points_y'] = comparisons[-1]['body_points_y'][:-3]
-
+    utils_chart.add_and_trim_comparison_body_points(comparisons, data) # Add Mars surface track and trim points out of range
+    
     # Note we're assuming horizontal velocity = angular velocity, and vertical velocity = radial velocity, which at any given instant relative to the surface should be true
 
     utils_chart.sub_plot((3,3,1), "Altitude vs Time", "Time (s)", "Altitude (m)", data.t, [data.alt], ["Simulation"], comparisons, ['AltVsTime-time'], ['AltVsTime-alt'])

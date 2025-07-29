@@ -13,17 +13,16 @@ def alt_vs_downrange_to_global_cartesian(comparison):
     # Convert to Cartesian coordinates (x, y)
     cartesian_x = []
     cartesian_y = []
-    net_angular_distance_rad = 0
+    
     for alt, dist in zip(comparison['AltVsDownrangeDist-alt'], comparison['AltVsDownrangeDist-dist']):
         radial_distance = utils_data.MARS_RADIUS + alt
-        net_angular_distance_rad += dist / radial_distance
+        angular_distance_rad = dist / radial_distance  # Convert distance to radians
         
-        # Take a break, then make sure sim_polar code is working in radians and not meters, since radius changes but 360 degrees is always circumference
+        global_cartesian_pos_x = radial_distance * math.sin(angular_distance_rad) / 1000  # Convert to km
+        global_cartesian_pos_y = radial_distance * math.cos(angular_distance_rad) / 1000
         
-        x = dist * math.cos(math.radians(alt))
-        y = dist * math.sin(math.radians(alt))
-        cartesian_x.append(x)
-        cartesian_y.append(y)
+        cartesian_x.append(global_cartesian_pos_x)
+        cartesian_y.append(global_cartesian_pos_y)
 
     comparison['global_cartesian_pos_x'] = cartesian_x
     comparison['global_cartesian_pos_y'] = cartesian_y

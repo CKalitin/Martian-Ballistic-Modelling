@@ -72,7 +72,6 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
     
     altitude = entry_altitude
     radial_distance = entry_altitude + utils_data.MARS_RADIUS  # Distance from the center of Mars
-    net_angular_distance_m = 0
     net_angular_distance_rad = 0 # radians
     
     vel_net_m = entry_velocity # m/s
@@ -90,7 +89,7 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
         atm_temperature = utils_sim.get_temperature(altitude)
         atm_density = utils_sim.get_atmospheric_density(altitude, atm_pressure, atm_temperature)
 
-        aoa = utils_sim.get_interpolated_aoa(aoa_list, altitude)
+        aoa = utils_sim.get_interpolated_aoa(aoa_list, vel_net_m)
 
         drag_coeff = utils_sim.get_interpolated_drag_coefficient(vel_net_m)
 

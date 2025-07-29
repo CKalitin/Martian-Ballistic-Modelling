@@ -54,12 +54,10 @@ def get_gravity_acc(radial_distance):
 
 def get_drag_acc(mass, vel_net, area, atm_density):
     # mass = kg, vel_net = m/s, area = m^2, atm_density = kg/m^3
-    
     drag_coeff = get_interpolated_drag_coefficient(vel_net)
-    
     return -0.5 * atm_density * vel_net**2 * drag_coeff * area / mass
 
 def get_lift_acc(drag_acc, aoa):
     # drag_acc = m/s^2, flight_path_angle = degrees
     ld = get_interpolated_lift_to_drag_ratio(aoa)
-    return -drag_acc * ld if ld != 0 else 0
+    return drag_acc * ld if ld != 0 else 0

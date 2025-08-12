@@ -6,7 +6,7 @@ import matplotlib.ticker as ticker
 
 BOLTZMANN_CONSTANT = 1.380649e-23 # J/K
 ATMOSPHERIC_TEMPERATURE = 250 # K
-MEAN_MOLAR_MASS = 0.04 # kg/mol
+MEAN_MOLAR_MASS = 0.032 # kg/mol
 GRAVITATIONAL_ACCELERATION = 1.62 # m/s²
 AVOGADRO_NUMBER = 6.02214076e23 # mol⁻¹
 
@@ -49,7 +49,7 @@ def set_body_pressure(sim_parameters: utils_data.SimParameters, surface_pressure
 def set_body_parameters(sim_parameters: utils_data.SimParameters):
     sim_parameters.body_radius = 1737400  # Lunar radius in meters
     sim_parameters.body_mass = 7.34767309e22  # Lunar mass in kg
-    sim_parameters.atmospheric_molar_mass = 40.0  # g/mol (for Moon's atmosphere, oxygen rich so higher)
+    sim_parameters.atmospheric_molar_mass = 32.0  # g/mol (for Moon's atmosphere, oxygen rich so higher)
 
     sim_parameters.temp_data = np.array([250, 250]) # K, constant temp
     sim_parameters.temp_alt_data = np.array([-10000000, 10000000]) # m
@@ -182,7 +182,7 @@ def sim_atmospheres(surface_atmospheric_pressures, file_path="Lunar Atmosphere/"
         Entry Velocity: {round(params['entry_velocity']/1000, 2)} km/s
         Entry Flight Path Angle: {params['entry_flight_path_angle']}°
         Time Step: {params['time_step']} s
-        Atm. Scale Height: 32.1 km       
+        Atm. Scale Height: 40.1 km       
     """
 
     plt.text(0.640, 0.745, textbox_text,

@@ -135,6 +135,8 @@ def simulate(sim_parameters, mass, area, entry_altitude, entry_flight_path_angle
         vel_rad_m, vel_ang_m = temp_vel_rad_m, temp_vel_ang_m
         
         t += time_step
+        
+        time.sleep(0.1)
 
     parameters = {'mass': mass, 'area': area, 'ballistic_coefficient': mass/area, 'entry_altitude': entry_altitude, 'entry_flight_path_angle': entry_flight_path_angle, 'entry_velocity': entry_velocity, 'time_step': time_step, 'time_max': time_max}
     
@@ -186,6 +188,16 @@ if __name__ == "__main__":
 
     sim_parameters = utils_data.SimParameters(body='Mars') # Slightly bad naming on my part, this is core simulation body/atmosphere parameters, not vehicle parameters
 
-    data, params = simulate(sim_parameters, mass, area, entry_altitude, entry_flight_path_angle, entry_velocity, aoa_function=aoa_function, time_step=0.1, time_max=10000, verbose=False)
+    data, params = simulate(sim_parameters,
+                            mass,
+                            area,
+                            entry_altitude,
+                            entry_flight_path_angle,
+                            entry_velocity,
+                            aoa_function=aoa_function,
+                            time_step=0.1,
+                            time_max=10000,
+                            verbose=False
+                        )
 
     plot(sim_parameters, data, params, title="Mars Entry Simulation Example", file_name="test.png", show=True)

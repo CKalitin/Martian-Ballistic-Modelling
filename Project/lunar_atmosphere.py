@@ -103,7 +103,7 @@ def set_aerodynamic_parameters(sim_parameters: utils_data.SimParameters, vehicle
 
 sim_parameters = utils_data.SimParameters(body='Lunar')
 set_body_parameters(sim_parameters)
-set_body_pressure(sim_parameters, surface_pressure=1e5)
+set_body_pressure(sim_parameters, surface_pressure=1e3)
 set_aerodynamic_parameters(sim_parameters, vehicle='blunt_body')
 
 data, params = sim_polar.simulate(

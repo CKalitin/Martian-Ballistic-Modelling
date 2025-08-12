@@ -45,7 +45,7 @@ class SimParameters:
         -90,-16,-11,-6,-4,-2,0,2,4,6,11,16,90
     ])
 
-    # Atmospheric pressure data, pressure vs. altitude (m)
+    # Atmospheric pressure data, pressure (kPa?) vs. altitude (m)
     pressure_data = np.array([
         23.257310206, 9.565493821, 2.925754907, 0.963657775, 0.254181943, 0.097081899,
         0.031975928, 0.009082373, 0.002991467, 0.000985301, 0.000324529, 0.000092179,

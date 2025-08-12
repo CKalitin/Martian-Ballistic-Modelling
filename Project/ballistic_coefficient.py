@@ -1,4 +1,5 @@
 import sim_polar
+import utils_data
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -30,8 +31,10 @@ results = {}
 for aoa in aoa_list:
     print(f"\n=== Running AoA = {aoa} ===")
     tvs = []
+    sim_parameters = utils_data.SimParameters()
     for mass in masses:
         data, params = sim_polar.simulate(
+            sim_parameters,
             mass=mass,
             area=area,
             entry_altitude=entry_altitude,
@@ -45,7 +48,7 @@ for aoa in aoa_list:
         term_v = data.v_net[-1]
         tvs.append(term_v)
         print(f"  Mass={mass:.3f} kg -> V_terminal={term_v:.2f} m/s")
-        sim_polar.plot(data, params, file_name=f"{file_path}raw/BC_{(mass / area):.3f}_AoA_{aoa:+d}".replace('.', '-'), show=False)
+        sim_polar.plot(sim_parameters, data, params, file_name=f"{file_path}raw/BC_{(mass / area):.3f}_AoA_{aoa:+d}".replace('.', '-'), show=False)
     results[aoa] = np.array(tvs)
 
 # print CSV-style summary

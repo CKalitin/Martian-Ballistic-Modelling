@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
 import math
 
-import utils_data
-
 def sub_plot(position, title, x_label, y_label, x_data, y_data_list, series_labels, comparisons=[], comparison_x_key=None, comparison_y_keys=None, comparison_label_field='label', equal_aspect = False):
     """
     Creates a subplot and plots multiple data series, with optional comparison series.
@@ -95,7 +93,7 @@ def sub_plot_atmosphere(position, data):
     plt.subplot(3, 3, 9)
     plt.axis('off')
 
-def sub_plot_text(position, parameters, data):
+def sub_plot_text(position, sim_parameters, parameters, data):
     """
     Creates a subplot and plots multiple data series with text annotations.
     """
@@ -123,7 +121,7 @@ def sub_plot_text(position, parameters, data):
     impact_values_text = [
         (0, f"Impact Values:", 'bold'),
         (0, f"Final Altitude: {data.alt[-1]:.2f} m", None),
-        (0, f"Final Downrange Distance: {(data.ang_dist_rad[-1] * utils_data.MARS_RADIUS):.2f} m", None),
+        (0, f"Final Downrange Distance: {(data.ang_dist_rad[-1] * sim_parameters.body_radius):.2f} m", None),
         (0, f"Final Angular Displacement: {math.degrees(data.ang_dist_rad[-1]):.2f}°", None),
         (1, f"Final Velocity: {data.v_net[-1]:.2f} m/s", None),
         (1, f"Final Horizontal Velocity: {data.v_ang[-1]:.2f} m/s", None),
@@ -172,7 +170,7 @@ def remove_comparison_body_points_out_of_range(comparison, data):
     comparison['body_points_x'] = filtered_x
     comparison['body_points_y'] = filtered_y
 
-def add_and_trim_comparison_body_points(comparisons, data):
+def add_and_trim_comparison_body_points(sim_parameters, comparisons, data):
     """
     Adds body (Mars, currently) points to the comparison dictionary from the data object.
     Also trim the points in the body points and flight path points of comparisons (Currently only exist for Perseverance).
@@ -183,7 +181,7 @@ def add_and_trim_comparison_body_points(comparisons, data):
             remove_comparison_body_points_out_of_range(comparison, data)
     
     # Add Mars body for global cartesian position chart
-    comparisons.insert(0, {'body_points_x': utils_data.mars_circumference_points_km_x, 'body_points_y': utils_data.mars_circumference_points_km_y, 'label': 'Mars Surface'})
+    comparisons.insert(0, {'body_points_x': sim_parameters.mars_circumference_points_km_x, 'body_points_y': sim_parameters.mars_circumference_points_km_y, 'label': 'Mars Surface'})
     remove_comparison_body_points_out_of_range(comparisons[0], data)
 
     # remove last 3 from x and y, yea im just hardcoding this in, it makes it loop back and puts an ugly line across the graph

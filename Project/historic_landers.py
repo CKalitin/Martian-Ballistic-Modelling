@@ -4,7 +4,9 @@ import numpy as np
 import sim_polar
 import utils_data
 
-def alt_vs_downrange_to_global_cartesian(comparison):
+sim_parameters = utils_data.SimParameters()
+
+def alt_vs_downrange_to_global_cartesian(sim_parameters, comparison):
     """
     Converts altitude vs downrange distance data from a comparison dictionary
     to global Cartesian coordinates, modifying the dictionary in place.
@@ -15,7 +17,7 @@ def alt_vs_downrange_to_global_cartesian(comparison):
     cartesian_y = []
     
     for alt, dist in zip(comparison['AltVsDownrangeDist-alt'], comparison['AltVsDownrangeDist-dist']):
-        radial_distance = utils_data.MARS_RADIUS + alt
+        radial_distance = sim_parameters.body_radius + alt
         angular_distance_rad = dist / radial_distance  # Convert distance to radians
         
         global_cartesian_pos_x = radial_distance * math.sin(angular_distance_rad) / 1000  # Convert to km
@@ -170,7 +172,7 @@ starship = {
     ])
 }
 
-alt_vs_downrange_to_global_cartesian(perseverance)
+alt_vs_downrange_to_global_cartesian(sim_parameters, perseverance)
 
 # Velocity vs. AoA, interpolated
 curiosity_aoa = [
@@ -184,6 +186,7 @@ curiosity_aoa = [
 ]
 
 curiosity_data, curiosity_params = sim_polar.simulate(
+    sim_parameters,
     mass=3300,
     area=15.9,
     entry_altitude=125000,
@@ -209,6 +212,7 @@ perseverance_aoa = [
 ]
 
 perseverance_data, perseverance_params = sim_polar.simulate(
+    sim_parameters,
     mass=3110,
     area=15.9,
     entry_altitude=125000,
@@ -221,6 +225,7 @@ perseverance_data, perseverance_params = sim_polar.simulate(
 )
 
 phoenix_data, phoenix_params = sim_polar.simulate(
+    sim_parameters,
     mass=670,
     area=15.9,
     entry_altitude=125000,
@@ -233,6 +238,7 @@ phoenix_data, phoenix_params = sim_polar.simulate(
 )
 
 opportunity_data, opportunity_params = sim_polar.simulate(
+    sim_parameters,
     mass=827,
     area=15.9,
     entry_altitude=125000,
@@ -261,6 +267,7 @@ starship_aoa = [
 # Fitting to the Starship trajectory is actually not ideal, it starts its burn way too early, ~500m/s. I can do better!
 
 starship_data, starship_params = sim_polar.simulate(
+    sim_parameters,
     mass=200000,
     area=481,
     entry_altitude=125000,
@@ -272,8 +279,8 @@ starship_data, starship_params = sim_polar.simulate(
     verbose=False,
 )
 
-sim_polar.plot(perseverance_data, perseverance_params, title="Perseverance Mars Entry Simulation", file_name="Historic Lander Charts/Perseverance.png", show=False, comparisons=[perseverance])
-sim_polar.plot(curiosity_data, curiosity_params, title="Curiosity Mars Entry Simulation", file_name="Historic Lander Charts/Curiosity.png", show=False, comparisons=[curiosity])
-sim_polar.plot(phoenix_data, phoenix_params, title="Phoenix Mars Entry Simulation", file_name="Historic Lander Charts/Phoenix.png", show=False, comparisons=[phoenix])
-sim_polar.plot(opportunity_data, opportunity_params, title="Opportunity Mars Entry Simulation", file_name="Historic Lander Charts/Opportunity.png", show=False, comparisons=[opportunity])
-sim_polar.plot(starship_data, starship_params, title="Starship Mars Entry Simulation", file_name="Historic Lander Charts/Starship.png", show=False, comparisons=[starship])
+sim_polar.plot(sim_parameters, perseverance_data, perseverance_params, title="Perseverance Mars Entry Simulation", file_name="Historic Lander Charts/Perseverance.png", show=False, comparisons=[perseverance])
+sim_polar.plot(sim_parameters, curiosity_data, curiosity_params, title="Curiosity Mars Entry Simulation", file_name="Historic Lander Charts/Curiosity.png", show=False, comparisons=[curiosity])
+sim_polar.plot(sim_parameters, phoenix_data, phoenix_params, title="Phoenix Mars Entry Simulation", file_name="Historic Lander Charts/Phoenix.png", show=False, comparisons=[phoenix])
+sim_polar.plot(sim_parameters, opportunity_data, opportunity_params, title="Opportunity Mars Entry Simulation", file_name="Historic Lander Charts/Opportunity.png", show=False, comparisons=[opportunity])
+sim_polar.plot(sim_parameters, starship_data, starship_params, title="Starship Mars Entry Simulation", file_name="Historic Lander Charts/Starship.png", show=False, comparisons=[starship])

@@ -21,6 +21,7 @@ import utils_data
 # TODO:
 # - Bank angle (angle between normal of the vehicle and normal of the surface)
 # - Parachute (not too hard, just use parachute area and drag coefficient)
+# - Save to CSV
 
 @dataclass
 class SimData:
@@ -45,10 +46,11 @@ class SimData:
         """Get timestep i as dict."""
         return {f: getattr(self, f)[i] for f in self.__dataclass_fields__}
 
-def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity, aoa_function=None, time_step=0.1, time_max=1000, verbose=False):
+def simulate(sim_parameters, mass, area, entry_altitude, entry_flight_path_angle, entry_velocity, aoa_function=None, time_step=0.1, time_max=1000, verbose=False):
     """Simulate Mars entry trajectory.
 
     Args:
+        sim_parameters (SimParameters): Simulation parameters class from utils_data.py.
         mass (float): Mass of entry vehicle.
         entry_altitude (float): Initial altitude (m).
         entry_flight_path_angle (float): Initial flight path angle (degrees).
@@ -66,13 +68,15 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
     
     simulation_start_time = time.time()
 
+    sim_utils = utils_sim.SimUtils(sim_parameters)
+
     # If AoA is a single value, convert to list of lists of altitude vs. AoA (This is then interpolated to get AoA at any given altitude)
     if type(aoa_function) != list:
         aoa_function = [[entry_altitude, aoa_function], [0, aoa_function]]
-    aoa_list = utils_sim.get_numpy_aoa_list(aoa_function)
+    aoa_list = sim_utils.get_numpy_aoa_list(aoa_function)
     
     altitude = entry_altitude
-    radial_distance = entry_altitude + utils_data.MARS_RADIUS  # Distance from the center of Mars
+    radial_distance = entry_altitude + sim_parameters.body_radius  # Distance from the center of Mars
     net_angular_distance_rad = 0 # radians
     
     vel_net_m = entry_velocity # m/s
@@ -86,18 +90,18 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
     t = 0
     while t < time_max and altitude > 0:
         # Calculate initial timestep conditions
-        atm_pressure = utils_sim.get_atmospheric_pressure(altitude)
-        atm_temperature = utils_sim.get_temperature(altitude)
-        atm_density = utils_sim.get_atmospheric_density(altitude, atm_pressure, atm_temperature)
+        atm_pressure = sim_utils.get_atmospheric_pressure(altitude)
+        atm_temperature = sim_utils.get_temperature(altitude)
+        atm_density = sim_utils.get_atmospheric_density(altitude, atm_pressure, atm_temperature)
 
-        aoa = utils_sim.get_interpolated_aoa(aoa_list, vel_net_m)
+        aoa = sim_utils.get_interpolated_aoa(aoa_list, vel_net_m)
 
-        drag_coeff = utils_sim.get_interpolated_drag_coefficient(vel_net_m)
+        drag_coeff = sim_utils.get_interpolated_drag_coefficient(vel_net_m)
 
         # Calculate acceleration
-        a_grav = utils_sim.get_gravity_acc(radial_distance)
-        a_drag = utils_sim.get_drag_acc(mass, vel_net_m, area, atm_density)
-        a_lift = utils_sim.get_lift_acc(a_drag, aoa)
+        a_grav = sim_utils.get_gravity_acc(radial_distance)
+        a_drag = sim_utils.get_drag_acc(mass, vel_net_m, area, atm_density)
+        a_lift = sim_utils.get_lift_acc(a_drag, aoa)
 
         # Update velocities
         a_rad = a_grav + math.sin(math.radians(flight_path_angle)) * a_drag + math.sin(math.radians(flight_path_angle + 90)) * a_lift
@@ -113,7 +117,7 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
 
         # Update Positions
         radial_distance += vel_rad_m * time_step
-        altitude = radial_distance - utils_data.MARS_RADIUS
+        altitude = radial_distance - sim_parameters.body_radius
         
         angular_distance_m = vel_ang_m * time_step
         angular_distance_rad = angular_distance_m / radial_distance # theta = s/r
@@ -139,7 +143,7 @@ def simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity
 
     return data, parameters
 
-def plot(data, parameters, title="Mars Entry Simulation", file_name="mars_entry_simulation.png", show=False, comparisons=None):
+def plot(sim_parameters, data, parameters, title="Mars Entry Simulation", file_name="mars_entry_simulation.png", show=False, comparisons=None):
     # Comparisions is a list of tuples (velocity, altitude, label), MAKE SURE ITS A LIST, NOT JUST A TUPLE, USE THE SQUARE BRACKETS
     if comparisons is None:
         comparisons = []
@@ -149,7 +153,7 @@ def plot(data, parameters, title="Mars Entry Simulation", file_name="mars_entry_
     plt.gcf().text(0.01, 0.965, f"Christopher Kalitin 2025", fontsize=12)
     plt.axis('off')
     
-    utils_chart.add_and_trim_comparison_body_points(comparisons, data) # Add Mars surface track and trim points out of range
+    utils_chart.add_and_trim_comparison_body_points(sim_parameters, comparisons, data) # Add Mars surface track and trim points out of range
     
     # Note we're assuming horizontal velocity = angular velocity, and vertical velocity = radial velocity, which at any given instant relative to the surface should be true
 
@@ -162,7 +166,7 @@ def plot(data, parameters, title="Mars Entry Simulation", file_name="mars_entry_
     utils_chart.sub_plot((3,3,6), "Drag, Lift, Gravity Acceleration vs Time", "Time (s)", "Acceleration (m/s²)", data.t, [data.a_drag, data.a_lift, data.a_grav], ["Drag Acceleration", "Lift Acceleration", "Gravity Acceleration"])
     utils_chart.sub_plot((3,3,7), "Flight Path Angle and Angle of Attack vs Time", "Time (s)", "Angle (degrees)", data.t, [data.fpa, data.aoa], ["Flight Path Angle", "Angle of Attack"], comparisons, ['AoAVsTime-time', 'FlightPathAngleVsTime-time'], ['AoAVsTime-aoa', 'FlightPathAngleVsTime-fpa'], 'FlightPathAngleVsTime-label')
     utils_chart.sub_plot_atmosphere((3,3,8), data)
-    utils_chart.sub_plot_text((3,3,9), parameters, data)
+    utils_chart.sub_plot_text((3,3,9), sim_parameters, parameters, data)
 
     plt.subplots_adjust(left=0.055, right=0.98, top=0.925, bottom=0.042, hspace=0.29, wspace=0.31)
 
@@ -180,6 +184,8 @@ if __name__ == "__main__":
     entry_velocity = 3800  # m/s
     aoa_function = 0
 
-    data, params = simulate(mass, area, entry_altitude, entry_flight_path_angle, entry_velocity, aoa_function=aoa_function, time_step=0.1, time_max=10000, verbose=False)
-    
-    plot(data, params, title="Mars Entry Simulation Example", file_name="test.png", show=True)
+    sim_parameters = utils_data.SimParameters() # Slightly bad naming on my part, this is core simulation body/atmosphere parameters, not vehicle parameters
+
+    data, params = simulate(sim_parameters, mass, area, entry_altitude, entry_flight_path_angle, entry_velocity, aoa_function=aoa_function, time_step=0.1, time_max=10000, verbose=False)
+
+    plot(sim_parameters, data, params, title="Mars Entry Simulation Example", file_name="test.png", show=True)

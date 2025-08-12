@@ -103,20 +103,23 @@ def set_aerodynamic_parameters(sim_parameters: utils_data.SimParameters, vehicle
 
 sim_parameters = utils_data.SimParameters(body='Lunar')
 set_body_parameters(sim_parameters)
-set_body_pressure(sim_parameters, surface_pressure=1e3)
+set_body_pressure(sim_parameters, surface_pressure=1e-5)
 set_aerodynamic_parameters(sim_parameters, vehicle='blunt_body')
 
 data, params = sim_polar.simulate(
     sim_parameters=sim_parameters,
     mass=1000,
     area=10,
-    entry_altitude=100000,
-    entry_flight_path_angle=-15,
-    entry_velocity=6000,
-    aoa_function=0,
+    entry_altitude=200000,
+    entry_flight_path_angle=0,
+    entry_velocity=1600,
+    aoa_function=20,
     time_step=0.1,
     time_max=10000,
     verbose=False,
 )
 
-sim_polar.plot(sim_parameters, data, params, title="Lunar Entry Simulation Example", file_name="lunar_test.png", show=True)
+# 1591 m/s is orbital velocity at 200 km.
+# 1600 m/s is 243x200 km, if starting at 200 km.
+
+sim_polar.plot(sim_parameters, data, params, title="Lunar Entry Simulation", file_name="lunar_test.png", show=True)

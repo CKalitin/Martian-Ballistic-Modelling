@@ -49,7 +49,6 @@ class SimUtils:
             pressure = self.get_atmospheric_pressure(alt)
         if temperature is None:
             temperature = self.get_temperature(alt)
-        print(pressure)
         
         r = utils_data.UNIVERSAL_GAS_CONSTANT / (self.sim_parameters.atmospheric_molar_mass / 1000) # About 192.1 g/mol
     

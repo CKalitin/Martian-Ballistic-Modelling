@@ -31,7 +31,7 @@ results = {}
 for aoa in aoa_list:
     print(f"\n=== Running AoA = {aoa} ===")
     tvs = []
-    sim_parameters = utils_data.SimParameters()
+    sim_parameters = utils_data.SimParameters(body='Mars')
     for mass in masses:
         data, params = sim_polar.simulate(
             sim_parameters,

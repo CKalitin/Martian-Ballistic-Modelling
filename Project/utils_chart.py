@@ -181,7 +181,7 @@ def add_and_trim_comparison_body_points(sim_parameters, comparisons, data):
             remove_comparison_body_points_out_of_range(comparison, data)
     
     # Add Mars body for global cartesian position chart
-    comparisons.insert(0, {'body_points_x': sim_parameters.mars_circumference_points_km_x, 'body_points_y': sim_parameters.mars_circumference_points_km_y, 'label': 'Mars Surface'})
+    comparisons.insert(0, {'body_points_x': sim_parameters.body_circumference_points_km_x, 'body_points_y': sim_parameters.body_circumference_points_km_y, 'label': f'{sim_parameters.body} Surface'})
     remove_comparison_body_points_out_of_range(comparisons[0], data)
 
     # remove last 3 from x and y, yea im just hardcoding this in, it makes it loop back and puts an ugly line across the graph

@@ -184,7 +184,7 @@ if __name__ == "__main__":
     entry_velocity = 3800  # m/s
     aoa_function = 0
 
-    sim_parameters = utils_data.SimParameters() # Slightly bad naming on my part, this is core simulation body/atmosphere parameters, not vehicle parameters
+    sim_parameters = utils_data.SimParameters(body='Mars') # Slightly bad naming on my part, this is core simulation body/atmosphere parameters, not vehicle parameters
 
     data, params = simulate(sim_parameters, mass, area, entry_altitude, entry_flight_path_angle, entry_velocity, aoa_function=aoa_function, time_step=0.1, time_max=10000, verbose=False)
 

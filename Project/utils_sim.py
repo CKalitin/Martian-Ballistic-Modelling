@@ -15,10 +15,10 @@ class SimUtils:
 
     def get_interpolated_lift_to_drag_ratio(self, aoa):
         # aoa = degrees
-        if aoa < self.sim_parameters.ld_vel_data[0] or aoa > self.sim_parameters.ld_vel_data[-1]:
-            raise ValueError(f"Angle of attack {aoa} degrees is outside the data range [{self.sim_parameters.ld_vel_data[-1]}, {self.sim_parameters.ld_vel_data[0]}] degrees")
+        if aoa < self.sim_parameters.ld_deg_data[0] or aoa > self.sim_parameters.ld_deg_data[-1]:
+            raise ValueError(f"Angle of attack {aoa} degrees is outside the data range [{self.sim_parameters.ld_deg_data[-1]}, {self.sim_parameters.ld_deg_data[0]}] degrees")
 
-        return np.interp(aoa, self.sim_parameters.ld_vel_data, self.sim_parameters.ld_ratio_data)
+        return np.interp(aoa, self.sim_parameters.ld_deg_data, self.sim_parameters.ld_ratio_data)
 
     def get_numpy_aoa_list(self, aoa_list):
         # aoa_list = [(alt, aoa), ...], alt = meters, aoa = degrees
@@ -34,6 +34,7 @@ class SimUtils:
     def get_atmospheric_pressure(self, alt):
         # alt = meters, atmospheric pressure = Pa
         if (alt < self.sim_parameters.pressure_alt_data[0]):
+            # Note this is only for Mars
             return 699*np.exp(-0.0000945*alt)
 
         return np.interp(alt, self.sim_parameters.pressure_alt_data, self.sim_parameters.pressure_data)
@@ -48,8 +49,10 @@ class SimUtils:
             pressure = self.get_atmospheric_pressure(alt)
         if temperature is None:
             temperature = self.get_temperature(alt)
-            
-        return pressure / (192.1 * temperature)  # Ideal gas law: density = pressure / (R * T)
+        
+        r = utils_data.UNIVERSAL_GAS_CONSTANT / self.sim_parameters.atmospheric_molar_mass * 1000 # About 192.1 g/mol
+    
+        return pressure / (r * temperature)  # Ideal gas law: density = pressure / (R * T)
 
     def get_gravity_acc(self, radial_distance):
         # radial_distance = distance from the center of Mars (m)

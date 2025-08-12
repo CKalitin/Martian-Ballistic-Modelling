@@ -4,7 +4,7 @@ import numpy as np
 import sim_polar
 import utils_data
 
-sim_parameters = utils_data.SimParameters()
+sim_parameters = utils_data.SimParameters(body='Mars')
 
 def alt_vs_downrange_to_global_cartesian(sim_parameters, comparison):
     """
